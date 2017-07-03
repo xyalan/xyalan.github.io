@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>Linux的文件权限及用户组 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="今天在查看自己电脑上工作目录下项目时，发现有一个项目的目录权限与其他不同，颜色也就在所有目录里显得格外显眼。对于我这种有点轻微强迫症的人来说，总感觉很别扭。可一直对Unix系的系统权限理解不是那么清晰，总是模糊的记得有chmod和chown两个命令。因此索性就系统的看了下关于Unix系系统文件的权限内容。 使用ls -al命令列出一个目录，如： ➜  oh-my-zsh git:(master)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux的文件权限及用户组">
+<meta property="og:url" content="http://yoursite.com/2014/06/23/linux-e7-9a-84-e6-96-87-e4-bb-b6-e6-9d-83-e9-99-90-e5-8f-8a-e7-94-a8-e6-88-b7-e7-bb-84/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="今天在查看自己电脑上工作目录下项目时，发现有一个项目的目录权限与其他不同，颜色也就在所有目录里显得格外显眼。对于我这种有点轻微强迫症的人来说，总感觉很别扭。可一直对Unix系的系统权限理解不是那么清晰，总是模糊的记得有chmod和chown两个命令。因此索性就系统的看了下关于Unix系系统文件的权限内容。 使用ls -al命令列出一个目录，如： ➜  oh-my-zsh git:(master)">
+<meta property="og:updated_time" content="2017-07-03T15:40:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux的文件权限及用户组">
+<meta name="twitter:description" content="今天在查看自己电脑上工作目录下项目时，发现有一个项目的目录权限与其他不同，颜色也就在所有目录里显得格外显眼。对于我这种有点轻微强迫症的人来说，总感觉很别扭。可一直对Unix系的系统权限理解不是那么清晰，总是模糊的记得有chmod和chown两个命令。因此索性就系统的看了下关于Unix系系统文件的权限内容。 使用ls -al命令列出一个目录，如： ➜  oh-my-zsh git:(master)">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#chgrp"><span class="toc-text">chgrp</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#chown"><span class="toc-text">chown</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#chmod"><span class="toc-text">chmod</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-linux-e7-9a-84-e6-96-87-e4-bb-b6-e6-9d-83-e9-99-90-e5-8f-8a-e7-94-a8-e6-88-b7-e7-bb-84" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">Linux的文件权限及用户组</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2014.06.23</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/操作系统/">操作系统</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2014/06/23/linux-e7-9a-84-e6-96-87-e4-bb-b6-e6-9d-83-e9-99-90-e5-8f-8a-e7-94-a8-e6-88-b7-e7-bb-84/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>今天在查看自己电脑上工作目录下项目时，发现有一个项目的目录权限与其他不同，颜色也就在所有目录里显得格外显眼。对于我这种有点轻微强迫症的人来说，总感觉很别扭。可一直对Unix系的系统权限理解不是那么清晰，总是模糊的记得有<code>chmod</code>和<code>chown</code>两个命令。因此索性就系统的看了下关于Unix系系统文件的权限内容。</p>
+<p>使用<code>ls -al</code>命令列出一个目录，如：</p>
+<pre><code>➜  oh-my-zsh git:(master) la
+total 40
+drwxr-xr-x   13 Alan  staff   442B Jun 23 15:50 .git
+-rw-r--r--    1 Alan  staff   130B Jun  6 23:49 .gitignore
+……
+`&lt;/pre&gt;
+一行第一部分`drwxr-xr-x`
+
+其中第一个代表的是文件的类型，类型有：
+</code></pre><ul>
+<li>若为<code>d</code>表示目录；</li>
+<li>若为<code>-</code>则表示文件；</li>
+<li>若为<code>l</code>则表示连接；</li>
+<li>若为<code>b</code>则表示为装置文件里面的可供储存的接口设备(可随机存取装置)；</li>
+<li><p>若是<code>c</code>则表示为装置文件里面的串行端口设备，例如键盘、鼠标(一次性读取装置)。<br>后面9个字符每3个为一组，其中第一组代表当前文件拥有者的权限，第二组代表当前拥有者所属用户组的权限，第三组则代表其他用户组的权限。并每一组中三个字符<code>r</code>代表可读(read)、<code>w</code>代表可写(write)、<code>x</code>代表可执行(execute)。</p>
+<p>一行第二部分表示连接到此节点文档数目。</p>
+<p>一行的第三部分表示当前文件的拥有者。</p>
+<p>一行的第四部分表示当前文件拥有者所属的用户组。</p>
+<p>一行当的第五部分表示文件的大小。</p>
+<p>一行的第六部分表示文件的创建日期或者修改日期。</p>
+<p>主要熟悉一下第一部分的权限，事实上跟权限相关的有三个命令：</p>
+</li>
+</ul>
+<ol>
+<li>chgrp:change group的缩写，改变文件的所属用户组；</li>
+<li>chown:change owner的缩写，改变文件的拥有者；</li>
+<li><p>chmod:change mode的缩写，改变文件模式，即可读、可写和可执行；</p>
+<h4 id="chgrp"><a href="#chgrp" class="headerlink" title="chgrp"></a>chgrp</h4><p>如想要改变一个文件的用户组为users，则为：<br><pre><code>chgrp users file</code></pre><br>这样文件的所属用户组被改为users，但其中有一点，这个用户组必须是/etc/group中所存在的，否则执行会报错。</p>
+<h4 id="chown"><a href="#chown" class="headerlink" title="chown"></a>chown</h4><p>需要改变文件的拥有者，则可以使用这个命令，如改变文件的拥有者为alan<br><pre><code>chown alan file</code></pre><br>这样这个文件的拥有者变为alan，需要注意的是这个用户是/etc/passwd中所包含的。若想改变文件的拥有者和用户组，也可是用这个命令，如：<br><pre><code>chown user:group file</code></pre><br>若需要改变目录及其子目录文件的拥有者，则可加上参数<code>-R</code>。</p>
+<h4 id="chmod"><a href="#chmod" class="headerlink" title="chmod"></a>chmod</h4><p>这个命令是修改文件的模式，比如文件是否可读、可写或者可执行。通常在修改模式时可是用两种方式，数字或者直接r、w、x这些。数字形式分别对应：</p>
+</li>
+</ol>
+<ul>
+<li>r可读代表4；</li>
+<li>w可写代表3；</li>
+<li><p>x可执行代表1.<br>一个文件的权限分为当前用户、当前用户所属的用户组和其他组三部分，因此如一个命令：<br><pre><code>chmod 777 file</code></pre><br>其中<code>777</code>就表示了这个文件当前用户、当前用户组、其他组三部分的权限，7表示<code>4+3+1</code>。因此想要改变一个文件拥有者不可读、不可写、不可执行，只要第一个数字为<code>0</code>即可，若可读、可写、不可执行则第一个数字为<code>4+3</code>，一次类推。</p>
+<p>若使用字符，则更简单。用<code>u</code>表示当前用户，<code>g</code>表示用户组，<code>o</code>表示其他；<code>r</code>表示可读，<code>w</code>表示可写，<code>x</code>表示可执行；<code>=</code>表示设定权限，<code>-</code>表示去掉权限，<code>+</code>表示添加权限。这样如果想为文件去掉其他用户组的可执行权限，执行：<br><pre><code>chmod o-x file</code></pre><br>为一个文件添加当前拥有者的可读、可写、可执行权限，其他用户组去掉可执行权限，则可以这样写：<br><pre>`chmod u+rwx,o-x file</pre></p>
+</li>
+</ul>
+<p>字符改变权限比数字更加直观灵活，同样的想改变一个目录及所有子目录文件的权限，和<code>chgrp</code>、<code>chown</code>、<code>chmod</code>一样加上<code>-R</code>参数。</p>
+<p>系统的去研究一下一个知识点，会发现其实还是比较简单的。因此有时候觉得对一个知识点比较模糊，那就应该去找时间系统的学习。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2014/06/23/linux-e7-9a-84-e6-96-87-e4-bb-b6-e6-9d-83-e9-99-90-e5-8f-8a-e7-94-a8-e6-88-b7-e7-bb-84/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

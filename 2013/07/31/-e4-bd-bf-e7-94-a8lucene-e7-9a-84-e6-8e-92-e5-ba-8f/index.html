@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>使用lucene的排序 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="最近公司要对项目中的一个功能做一个优化，其中有一个是对目的地列表的排序优化，但是由于目的地这一块是之前的同事使用lucene做的，而自己也从来没有接触过lucene，所以就不得不通过各种方式了解并且解决。首先，由于之前的目的地排序是默认的，也就是没做排序。并且此次优化排序是要根据索引中未有的一个域，所以首先要更新索引生成的地方，添加这个域到索引中。然后就是索引查询排序的问题了。lucene默认也是">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用lucene的排序">
+<meta property="og:url" content="http://yoursite.com/2013/07/31/-e4-bd-bf-e7-94-a8lucene-e7-9a-84-e6-8e-92-e5-ba-8f/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="最近公司要对项目中的一个功能做一个优化，其中有一个是对目的地列表的排序优化，但是由于目的地这一块是之前的同事使用lucene做的，而自己也从来没有接触过lucene，所以就不得不通过各种方式了解并且解决。首先，由于之前的目的地排序是默认的，也就是没做排序。并且此次优化排序是要根据索引中未有的一个域，所以首先要更新索引生成的地方，添加这个域到索引中。然后就是索引查询排序的问题了。lucene默认也是">
+<meta property="og:updated_time" content="2017-07-03T15:40:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用lucene的排序">
+<meta name="twitter:description" content="最近公司要对项目中的一个功能做一个优化，其中有一个是对目的地列表的排序优化，但是由于目的地这一块是之前的同事使用lucene做的，而自己也从来没有接触过lucene，所以就不得不通过各种方式了解并且解决。首先，由于之前的目的地排序是默认的，也就是没做排序。并且此次优化排序是要根据索引中未有的一个域，所以首先要更新索引生成的地方，添加这个域到索引中。然后就是索引查询排序的问题了。lucene默认也是">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post--e4-bd-bf-e7-94-a8lucene-e7-9a-84-e6-8e-92-e5-ba-8f" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">使用lucene的排序</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2013.07.31</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/服务器/">服务器</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2013/07/31/-e4-bd-bf-e7-94-a8lucene-e7-9a-84-e6-8e-92-e5-ba-8f/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>最近公司要对项目中的一个功能做一个优化，其中有一个是对目的地列表的排序优化，但是由于目的地这一块是之前的同事使用lucene做的，而自己也从来没有接触过lucene，所以就不得不通过各种方式了解并且解决。<br>首先，由于之前的目的地排序是默认的，也就是没做排序。并且此次优化排序是要根据索引中未有的一个域，所以首先要更新索引生成的地方，添加这个域到索引中。<br>然后就是索引查询排序的问题了。lucene默认也是排序了的，它是根据索引的得分而排序的，所以这次排序是通过改变其得分达到效果。<br>在查询查询索引的时候,IndexSearcher对象的search方法有很多重载，默认使用search有两个参数的那个方法，如果我们需要自定义排序，则使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">search(query, n, sort)</div></pre></td></tr></table></figure>
+<p>第三个参数就是排序对象，构建这个排序对象：</p>
+<pre><code>Sort sort = new Sort(new SortField(&quot;impressCount&quot;, SortField.INT, true));
+</code></pre><p>其中排序对象构造函数中的那个参数中的构造函数参数表示要排序的域，第二个表示这个域要转换成的类型，如果没有第三个参数则是升序，如果true则是降序。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2013/07/31/-e4-bd-bf-e7-94-a8lucene-e7-9a-84-e6-8e-92-e5-ba-8f/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

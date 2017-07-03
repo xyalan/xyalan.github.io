@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>将svn迁移至git | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="SVN Git 迁移 Java," />
+  
+
+  <meta name="description" content="自己用Git很长时间，它的分支实在是太用好，自己甚是喜欢。这个世界不是完美的，还有一些公司会是其他的版本控制系统。新公司目前使用的是SVN，好在也有计划迁移至Git。对于SVN的迁移并不是什么难事儿，Git早已为我们想好了。 Git非常好的一个特性就是提供了git svn，它可以实现SVN和Git的双向桥接。它可以让你把Git作为一个SVN服务的客户端，这样就可以在本地使用Git的各种功能，然后把">
+<meta name="keywords" content="SVN Git 迁移 Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="将svn迁移至git">
+<meta property="og:url" content="http://yoursite.com/2015/01/23/migrate to git from svn/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="自己用Git很长时间，它的分支实在是太用好，自己甚是喜欢。这个世界不是完美的，还有一些公司会是其他的版本控制系统。新公司目前使用的是SVN，好在也有计划迁移至Git。对于SVN的迁移并不是什么难事儿，Git早已为我们想好了。 Git非常好的一个特性就是提供了git svn，它可以实现SVN和Git的双向桥接。它可以让你把Git作为一个SVN服务的客户端，这样就可以在本地使用Git的各种功能，然后把">
+<meta property="og:updated_time" content="2017-07-03T15:40:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="将svn迁移至git">
+<meta name="twitter:description" content="自己用Git很长时间，它的分支实在是太用好，自己甚是喜欢。这个世界不是完美的，还有一些公司会是其他的版本控制系统。新公司目前使用的是SVN，好在也有计划迁移至Git。对于SVN的迁移并不是什么难事儿，Git早已为我们想好了。 Git非常好的一个特性就是提供了git svn，它可以实现SVN和Git的双向桥接。它可以让你把Git作为一个SVN服务的客户端，这样就可以在本地使用Git的各种功能，然后把">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#准备"><span class="toc-text">准备</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#转换"><span class="toc-text">转换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#迁移"><span class="toc-text">迁移</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-migrate to git from svn" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">将svn迁移至git</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2015.01.23</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2015/01/23/migrate to git from svn/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>自己用Git很长时间，它的分支实在是太用好，自己甚是喜欢。这个世界不是完美的，还有一些公司会是其他的版本控制系统。新公司目前使用的是SVN，好在也有计划迁移至Git。对于SVN的迁移并不是什么难事儿，Git早已为我们想好了。</p>
+<p>Git非常好的一个特性就是提供了<code>git svn</code>，它可以实现SVN和Git的双向桥接。它可以让你把<code>Git</code>作为一个SVN服务的客户端，这样就可以在本地使用Git的各种功能，然后把代码推送到SVN。当然也可以使用它来做SVN的迁移。我把整个迁移过程分为三个阶段：准备极端、svn库转换阶段、迁移阶段。</p>
+<h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><p>保证本地环境已经包含<code>Git</code>和<code>git svn</code>，默认情况下<code>git svn</code>是没有安装，因此首先第一步要做的安装它，OS X下执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">brew install git svn</div></pre></td></tr></table></figure>
+<p>其他系统Google一下也很容易找到安装方法。另外由于<code>svn</code>和<code>git</code>的提交的用户记录方式不同，保证转换过来的<code>Git</code>库的用户记录一样，因此需要先导出用户信息。创建一个users.txt文件，然后执行下面命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">svn log --xml | grep author | sort -u | \</div><div class="line">perl -pe &apos;s/.*&gt;(.*?)&lt;.*/$1 = /&apos; &gt; users.txt</div></pre></td></tr></table></figure>
+<p>上面通过<code>svn</code>的命令得到<code>xml</code>格式的日志文件，然后过滤出用户信息并且排序，并保证写入文件的格式。修改users.txt文件，保证是如下格式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">schacon = Scott Chacon &lt;schacon@geemail.com&gt;</div><div class="line">selse = Someo Nelse &lt;selse@geemail.com&gt;</div></pre></td></tr></table></figure>
+<h3 id="转换"><a href="#转换" class="headerlink" title="转换"></a>转换</h3><p>准备好环境就可以开始把<code>SVN</code>库转换为<code>Git</code>库。<code>SVN</code>版本库的标准目录结构是/trunk、/branches、/tags，若版本库是标准的目录结构，则执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">git svn clone --stdlayout --authors-file=users.txt</div><div class="line">svn-repo my_project</div></pre></td></tr></table></figure>
+<p>若是非标准的目录结构，则还需要指定对应的目录，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">git svn clone --trunk=/trunk --branches=/branches</div><div class="line">--branches=/bugfixes --tags=/tags --authors-file=users.txt</div><div class="line">svn-repo my_project</div></pre></td></tr></table></figure>
+<p>如果希望导出的<code>Git</code>库不包含<code>SVN</code>的一些配置信息，则可加上参数<code>--no-metadata</code>。接下来是一些额外处理，清理<code>tag</code>的配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cp -Rf .git/refs/remotes/origin/tags/* .git/refs/tags/</div><div class="line">rm -Rf .git/refs/remotes/origin/tags</div></pre></td></tr></table></figure>
+<p>把<code>refs/remotes</code>目录下的references信息移到本地分支下面：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cp -Rf .git/refs/remotes/* .git/refs/heads/</div><div class="line">rm -Rf .git/refs/remotes</div></pre></td></tr></table></figure>
+<p>这样<code>svn</code>库到<code>git</code>库的转换基本就算完成了。</p>
+<h3 id="迁移"><a href="#迁移" class="headerlink" title="迁移"></a>迁移</h3><p>其实把转换版本库不难，难的是从<code>SVN</code>到<code>Git</code>的这样一个过程。因为<code>Git</code>和<code>SVN</code>的差别还是比较大的，如何适应<code>Git</code>库以及用好它，用何种方式的工作流是难点。上面转换完成后，我们可以继续使用<code>git svn</code>把修改提交到<code>SVN</code>中央仓库，也可以添加远程的<code>Git</code>库直接<code>push</code>。这取决目前团队的情况，若团队大部分人早已熟悉<code>Git</code>，那么转换完成之后就添加远程的<code>Git</code>库，然后<code>push</code>停用<code>SVN</code>中央仓库。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2015/01/23/migrate to git from svn/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

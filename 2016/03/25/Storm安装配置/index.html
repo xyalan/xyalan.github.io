@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>Storm安装配置 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="Storm Zookeeper 实时流 计算," />
+  
+
+  <meta name="description" content="Storm手册：步骤 storm依赖zookeeper，需要先安装zookeeper； 安装storm的依赖，包括java和python； 修改storm的配置文件storm.yaml； 使用storm脚本或者选择的监控方式运行storm；  安装Zookeeper集群这里有官方的文档，可以安装一个单机版或一个集群。Kafka集群也是以来与Zookeeper，因此可以直接使用。 安装依赖 Java">
+<meta name="keywords" content="Storm Zookeeper 实时流 计算">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Storm安装配置">
+<meta property="og:url" content="http://yoursite.com/2016/03/25/Storm安装配置/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="Storm手册：步骤 storm依赖zookeeper，需要先安装zookeeper； 安装storm的依赖，包括java和python； 修改storm的配置文件storm.yaml； 使用storm脚本或者选择的监控方式运行storm；  安装Zookeeper集群这里有官方的文档，可以安装一个单机版或一个集群。Kafka集群也是以来与Zookeeper，因此可以直接使用。 安装依赖 Java">
+<meta property="og:updated_time" content="2017-07-03T15:40:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Storm安装配置">
+<meta name="twitter:description" content="Storm手册：步骤 storm依赖zookeeper，需要先安装zookeeper； 安装storm的依赖，包括java和python； 修改storm的配置文件storm.yaml； 使用storm脚本或者选择的监控方式运行storm；  安装Zookeeper集群这里有官方的文档，可以安装一个单机版或一个集群。Kafka集群也是以来与Zookeeper，因此可以直接使用。 安装依赖 Java">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Storm手册："><span class="toc-text">Storm手册：</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#步骤"><span class="toc-text">步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#安装Zookeeper集群"><span class="toc-text">安装Zookeeper集群</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装依赖"><span class="toc-text">安装依赖</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装storm"><span class="toc-text">安装storm</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#启动"><span class="toc-text">启动</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#提交Topology"><span class="toc-text">提交Topology</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#注意："><span class="toc-text">注意：</span></a></li></ol></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-Storm安装配置" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">Storm安装配置</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2016.03.25</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2016/03/25/Storm安装配置/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h1 id="Storm手册："><a href="#Storm手册：" class="headerlink" title="Storm手册："></a>Storm手册：</h1><h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
+<li>storm依赖zookeeper，需要先安装zookeeper；</li>
+<li>安装storm的依赖，包括java和python；</li>
+<li>修改storm的配置文件storm.yaml；</li>
+<li>使用storm脚本或者选择的监控方式运行storm；</li>
+</ol>
+<h3 id="安装Zookeeper集群"><a href="#安装Zookeeper集群" class="headerlink" title="安装Zookeeper集群"></a>安装Zookeeper集群</h3><p><a href="https://zookeeper.apache.org/doc/trunk/zookeeperStarted.html" target="_blank" rel="external">这里</a>有官方的文档，可以安装一个单机版或一个集群。Kafka集群也是以来与Zookeeper，因此可以直接使用。</p>
+<h3 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h3><ol>
+<li>Java 8</li>
+<li>Python 2.6.6</li>
+</ol>
+<h3 id="安装storm"><a href="#安装storm" class="headerlink" title="安装storm"></a>安装storm</h3><p>下载storm的安装包，解压放在需要的位置，需要配置的有：</p>
+<ol>
+<li><p>Storm配置文件storm.yaml位于<code>conf/storm.yaml</code>下，是一个yaml格式的文件，<code>storm.zookeeper.servers:</code>表示Zookeeper的集群地址。若不是使用Zookeeper默认的端口，需要使用<code>storm.zookeeper.port</code>来配置端口号；否则直接像下面一样配置：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">storm.zookeeper.servers:</div><div class="line">  - &quot;111.222.333.444&quot;</div><div class="line">  - &quot;555.666.777.888&quot;</div></pre></td></tr></table></figure>
+</li>
+<li><p><code>storm.local.dir:</code>用来保存storm需要存储的少量状态数据，比如jars文件等，目录需要注意权限：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">storm.local.dir: &quot;/mnt/storm&quot;</div></pre></td></tr></table></figure>
+</li>
+<li><p><code>nimbus.host:</code>工作节点要要直到下载jars文件和confs文件的master机器，这个是配置master机器：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nimbus.host: &quot;111.222.333.44&quot;</div></pre></td></tr></table></figure>
+</li>
+<li><p><code>supervisor.slots.ports:</code>每一个worker需要监听一个段端口来接收消息，这个配置用来定义监听的端口号，若配置5个端口，则storm运行5个workers，配置3个运行3个，默认是4个，分别是 6700, 6701, 6702, 6703.配置如：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">supervisor.slots.ports:</div><div class="line">    - 6700</div><div class="line">    - 6701</div><div class="line">    - 6702</div><div class="line">    - 6703</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>在Config中有一个方法<code>setNumWorkers</code>可以设置worker的数量，它和<code>supervisor.slots.ports:</code>的区别在于<code>supervisor.slots.ports:</code>设置了worker数量的最大可用量。例如<code>supervisor.slots.ports:</code>设置为5个，<code>setNumWorkers</code>设置为3个，实际使用的worker只有3个，有2个worker是闲置的；若<code>supervisor.slots.ports:</code>设置为3个，<code>setNumWorkers</code>设置为5个，则实际只有3个workers存在并且运行；另外实际使用的woker还好Executors与Task有关，如果只有2个Executors和Task，那么即使启动3个woker实际也只有2个woker使用；</p>
+<h3 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h3><ol>
+<li>在master机器supervision下运行<code>bin/storm nimbus</code>来启动nimbus；</li>
+<li>在每一个worker机器supervision下运行<code>bin/storm supervisor</code>来启动supervisor，supervisor负责启动和停止<br>工作进程；</li>
+<li>在supervision下使用<code>bin/storm ui</code>可以启动监控页面；使用<code>ui.port</code>(value格式是数字)可以配置这个监控地址的端口号；</li>
+</ol>
+<h3 id="提交Topology"><a href="#提交Topology" class="headerlink" title="提交Topology"></a>提交Topology</h3><ol>
+<li>使用下面命令提交topology到storm：<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">storm jar jar-file.jar fullname.MainClass args</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="注意："><a href="#注意：" class="headerlink" title="注意："></a>注意：</h2><p>Storm的woker之间通信是通过查找主机名，然后通过netty建立连接通信的，因此要配置好主机名与ip的映射关系，否则会发生topology能成功提交，任务调度失败的情况。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2016/03/25/Storm安装配置/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

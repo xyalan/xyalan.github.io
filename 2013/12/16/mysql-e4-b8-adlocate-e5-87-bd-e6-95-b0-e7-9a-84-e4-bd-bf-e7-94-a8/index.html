@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>Mysql中LOCATE函数的使用 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="最近再做和去哪儿的一个酒店对接接口，其中涉及到在传递酒店城市时需要使用去哪儿标准的城市名称，并且对方也提供了所有的城市列表。 其中有一个问题就是我们这边的城市存储的名称还加上了省份前缀，所以再匹配时导致很多匹配不上。经过大脑的扫描，忽然想到了Mysql中的LOCATE函数。 这个函数有两种用法，其一： 1LOCATE(&amp;apos;substr&amp;apos;, &amp;apos;str&amp;apos;) 返回s">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mysql中LOCATE函数的使用">
+<meta property="og:url" content="http://yoursite.com/2013/12/16/mysql-e4-b8-adlocate-e5-87-bd-e6-95-b0-e7-9a-84-e4-bd-bf-e7-94-a8/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="最近再做和去哪儿的一个酒店对接接口，其中涉及到在传递酒店城市时需要使用去哪儿标准的城市名称，并且对方也提供了所有的城市列表。 其中有一个问题就是我们这边的城市存储的名称还加上了省份前缀，所以再匹配时导致很多匹配不上。经过大脑的扫描，忽然想到了Mysql中的LOCATE函数。 这个函数有两种用法，其一： 1LOCATE(&amp;apos;substr&amp;apos;, &amp;apos;str&amp;apos;) 返回s">
+<meta property="og:updated_time" content="2017-07-03T15:40:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mysql中LOCATE函数的使用">
+<meta name="twitter:description" content="最近再做和去哪儿的一个酒店对接接口，其中涉及到在传递酒店城市时需要使用去哪儿标准的城市名称，并且对方也提供了所有的城市列表。 其中有一个问题就是我们这边的城市存储的名称还加上了省份前缀，所以再匹配时导致很多匹配不上。经过大脑的扫描，忽然想到了Mysql中的LOCATE函数。 这个函数有两种用法，其一： 1LOCATE(&amp;apos;substr&amp;apos;, &amp;apos;str&amp;apos;) 返回s">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-mysql-e4-b8-adlocate-e5-87-bd-e6-95-b0-e7-9a-84-e4-bd-bf-e7-94-a8" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">Mysql中LOCATE函数的使用</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2013.12.16</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/数据库/">数据库</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2013/12/16/mysql-e4-b8-adlocate-e5-87-bd-e6-95-b0-e7-9a-84-e4-bd-bf-e7-94-a8/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>最近再做和去哪儿的一个酒店对接接口，其中涉及到在传递酒店城市时需要使用去哪儿标准的城市名称，并且对方也提供了所有的城市列表。</p>
+<p>其中有一个问题就是我们这边的城市存储的名称还加上了省份前缀，所以再匹配时导致很多匹配不上。经过大脑的扫描，忽然想到了Mysql中的<strong>LOCATE</strong>函数。</p>
+<p>这个函数有两种用法，其一：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">LOCATE(&apos;substr&apos;, &apos;str&apos;)</div></pre></td></tr></table></figure>
+<p>返回substr在str中第一次出现的位置，如果str中不存在substr则返回0；</p>
+<p>其二：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">LOCATE(&apos;substr&apos;, &apos;str&apos;， 5)</div></pre></td></tr></table></figure>
+<p>返回substr在str第5个位置后第一次出现的位置，如果在第5个位置后不存在substr则返回0。</p>
+<p>因此我使用如下来查询匹配的去哪儿城市：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">select * from  qunar_city qc where LOCATE(qc.name, myCiy) &gt; 0</div></pre></td></tr></table></figure>
+<p>其中myCity是我们这边城市的中文名称。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2013/12/16/mysql-e4-b8-adlocate-e5-87-bd-e6-95-b0-e7-9a-84-e4-bd-bf-e7-94-a8/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

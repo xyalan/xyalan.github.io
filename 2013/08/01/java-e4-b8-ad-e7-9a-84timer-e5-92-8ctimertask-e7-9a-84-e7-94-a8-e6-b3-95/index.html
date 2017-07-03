@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java中的Timer和TimerTask的用法  | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="经常我们都会有这样的需求，要固定的每隔一段时间执行某一个任务。比如我们做一个缓存来减少与数据库的交互，而为了使缓存与数据库中的数据尽量达到同步，需要每个固定的一段时间去数据库中的数据是否有更新以达到与缓存的同步。这样的需求可以做一个线程，线程中做一个死循环，循环中就是要执行的这个任务，每执行完一次让线程睡眠一段时间，这要就可以达到这个需求。但是用最简单最便捷的方式是使用Java为我们提供的计时器的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java中的Timer和TimerTask的用法 ">
+<meta property="og:url" content="http://yoursite.com/2013/08/01/java-e4-b8-ad-e7-9a-84timer-e5-92-8ctimertask-e7-9a-84-e7-94-a8-e6-b3-95/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="经常我们都会有这样的需求，要固定的每隔一段时间执行某一个任务。比如我们做一个缓存来减少与数据库的交互，而为了使缓存与数据库中的数据尽量达到同步，需要每个固定的一段时间去数据库中的数据是否有更新以达到与缓存的同步。这样的需求可以做一个线程，线程中做一个死循环，循环中就是要执行的这个任务，每执行完一次让线程睡眠一段时间，这要就可以达到这个需求。但是用最简单最便捷的方式是使用Java为我们提供的计时器的">
+<meta property="og:updated_time" content="2017-07-03T15:40:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java中的Timer和TimerTask的用法 ">
+<meta name="twitter:description" content="经常我们都会有这样的需求，要固定的每隔一段时间执行某一个任务。比如我们做一个缓存来减少与数据库的交互，而为了使缓存与数据库中的数据尽量达到同步，需要每个固定的一段时间去数据库中的数据是否有更新以达到与缓存的同步。这样的需求可以做一个线程，线程中做一个死循环，循环中就是要执行的这个任务，每执行完一次让线程睡眠一段时间，这要就可以达到这个需求。但是用最简单最便捷的方式是使用Java为我们提供的计时器的">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-java-e4-b8-ad-e7-9a-84timer-e5-92-8ctimertask-e7-9a-84-e7-94-a8-e6-b3-95" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">Java中的Timer和TimerTask的用法 </h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2013.08.01</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/Java基础/">Java基础</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2013/08/01/java-e4-b8-ad-e7-9a-84timer-e5-92-8ctimertask-e7-9a-84-e7-94-a8-e6-b3-95/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>经常我们都会有这样的需求，要固定的每隔一段时间执行某一个任务。比如我们做一个缓存来减少与数据库的交互，而为了使缓存与数据库中的数据尽量达到同步，需要每个固定的一段时间去数据库中的数据是否有更新以达到与缓存的同步。这样的需求可以做一个线程，线程中做一个死循环，循环中就是要执行的这个任务，每执行完一次让线程睡眠一段时间，这要就可以达到这个需求。但是用最简单最便捷的方式是使用Java为我们提供的计时器的工具类，即Timer和TimerTask。<br>Timer是一个普通的类，其中有几个重要的方法；而TimerTask则是一个抽象类，其中有一个抽象方法run()，类型线程中的run()方法。我们使用Timer创建一个他的对象，然后使用这对象的schedule方法来完成这种间隔的操作。schedule方法有三个参数，其中第一个参数就是TimerTask类型的对象，我们实现TimerTask的run()方法就是要周期执行的一个任务；第二个参数有两种类型，第一种是long类型，表示多长时间后开始执行，另一种是Date类型，表示从那个时间后开始执行；而第三个参数就是执行的周期，为long类型。schedule方法还有一种两个参数的执行重载，第一个参数仍然是TimerTask，第二个表示为long的形式表示多长时间后执行一次，为Date就表示某个时间后执行一次。<br>需要注意的是Timer就是一个线程，使用schedule方法完成对TimerTask的调度，多个TimerTask可以共用一个Timer，也就是说Timer对象调用一次schedule方法就是创建了一个线程，并且调用一次schedule后TimerTask是无限制的循环下去的，使用Timer的cancel()停止操作。当然同一个Timer执行一次cancel()方法后，所有Timer线程都被终止。<br>下面是示列代码：</p>
+<pre class="lang:java decode:true ">java.util.Timer timer = new java.util.Timer(true);
+// true 说明这个timer以daemon方式运行（优先级低，
+// 程序结束timer也自动结束），注意，javax.swing
+// 包中也有一个Timer类，如果import中用到swing包，
+// 要注意名字的冲突。
+
+TimerTask task = new TimerTask() {
+  public void run() {
+    //每次需要执行的代码放到这里面。
+  }
+};
+
+//以下是几种调度task的方法：
+timer.schedule(task, time);
+// time为Date类型：在指定时间执行一次。
+
+timer.schedule(task, firstTime, period);
+// firstTime为Date类型,period为long
+// 从firstTime时刻开始，每隔period毫秒执行一次。
+
+timer.schedule(task, delay)
+// delay 为long类型：从现在起过delay毫秒执行一次
+
+timer.schedule(task, delay, period)
+// delay为long,period为long：从现在起过delay毫秒以后，每隔period
+// 毫秒执行一次。</pre> 
+
+<p>完整的示例代码：<br>1、定制任务:</p>
+<pre class="lang:java decode:true ">import java.util.Timer;
+public class TimerTaskTest extends java.util.TimerTask{
+
+  @Override
+  public void run() {
+    // TODO Auto-generated method stub
+    System.out.println(&amp;quot;start&amp;quot;);
+  }
+}
+</pre> 
+
+<p>2.调用java.util.Timer ：</p>
+<pre class="lang:java decode:true ">import java.util.Timer;
+public class Test {
+  public static void main(String[] args){
+    Timer timer = new Timer();
+    timer.schedule(new TimerTaskTest(), 1000, 2000);
+  }
+}
+</pre> 
+
+<p>以上代码表示1秒后开始每个2秒钟执行一次TimerTaskTest中的run()方法。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2013/08/01/java-e4-b8-ad-e7-9a-84timer-e5-92-8ctimertask-e7-9a-84-e7-94-a8-e6-b3-95/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

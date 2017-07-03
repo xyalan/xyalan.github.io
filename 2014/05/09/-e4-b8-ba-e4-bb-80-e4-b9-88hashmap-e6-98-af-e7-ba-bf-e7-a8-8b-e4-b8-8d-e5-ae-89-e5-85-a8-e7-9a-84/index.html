@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>为什么HashMap是线程不安全的 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="这是前天淘宝面试被问道的一个问题，当时回答的并不好，确切的说并没有回答到点子上。要明白HashMap为什么是线程不安全的，就需要理解它是怎样去实现的，对于源码和实现我还是了解一些，只是突然之间发现回答的莫名其妙。事后想想，可能对于HashMap自己还是理解的不够透彻。 JAVA的doc中有对HashMap的描述：  Note that this implementation is not sync">
+<meta property="og:type" content="article">
+<meta property="og:title" content="为什么HashMap是线程不安全的">
+<meta property="og:url" content="http://yoursite.com/2014/05/09/-e4-b8-ba-e4-bb-80-e4-b9-88hashmap-e6-98-af-e7-ba-bf-e7-a8-8b-e4-b8-8d-e5-ae-89-e5-85-a8-e7-9a-84/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="这是前天淘宝面试被问道的一个问题，当时回答的并不好，确切的说并没有回答到点子上。要明白HashMap为什么是线程不安全的，就需要理解它是怎样去实现的，对于源码和实现我还是了解一些，只是突然之间发现回答的莫名其妙。事后想想，可能对于HashMap自己还是理解的不够透彻。 JAVA的doc中有对HashMap的描述：  Note that this implementation is not sync">
+<meta property="og:image" content="http://hialan.com/wp-content/uploads/2014/05/photo-e1400045307987-768x1024.jpg">
+<meta property="og:image" content="http://upload.wikimedia.org/math/b/c/c/bccfc7022dfb945174d9bcebad2297bb.png">
+<meta property="og:image" content="http://upload.wikimedia.org/math/b/c/c/bccfc7022dfb945174d9bcebad2297bb.png">
+<meta property="og:updated_time" content="2017-07-03T15:40:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="为什么HashMap是线程不安全的">
+<meta name="twitter:description" content="这是前天淘宝面试被问道的一个问题，当时回答的并不好，确切的说并没有回答到点子上。要明白HashMap为什么是线程不安全的，就需要理解它是怎样去实现的，对于源码和实现我还是了解一些，只是突然之间发现回答的莫名其妙。事后想想，可能对于HashMap自己还是理解的不够透彻。 JAVA的doc中有对HashMap的描述：  Note that this implementation is not sync">
+<meta name="twitter:image" content="http://hialan.com/wp-content/uploads/2014/05/photo-e1400045307987-768x1024.jpg">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post--e4-b8-ba-e4-bb-80-e4-b9-88hashmap-e6-98-af-e7-ba-bf-e7-a8-8b-e4-b8-8d-e5-ae-89-e5-85-a8-e7-9a-84" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">为什么HashMap是线程不安全的</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2014.05.09</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/Java基础/">Java基础</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2014/05/09/-e4-b8-ba-e4-bb-80-e4-b9-88hashmap-e6-98-af-e7-ba-bf-e7-a8-8b-e4-b8-8d-e5-ae-89-e5-85-a8-e7-9a-84/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>这是前天淘宝面试被问道的一个问题，当时回答的并不好，确切的说并没有回答到点子上。要明白HashMap为什么是线程不安全的，就需要理解它是怎样去实现的，对于源码和实现我还是了解一些，只是突然之间发现回答的莫名其妙。事后想想，可能对于HashMap自己还是理解的不够透彻。</p>
+<p>JAVA的doc中有对HashMap的描述：</p>
+<blockquote>
+<p><strong>Note that this implementation is not synchronized.</strong> If multiple threads access a hash map concurrently, and at least one of the threads modifies the map structurally, it <strong>must</strong> be synchronized externally. (A structural modification is any operation that adds or deletes one or more mappings; merely changing the value associated with a key that an instance already contains is not a structural modification.)<br>其中说到多线程环境下对map在上做了修改，必须要保持外部同步，后面括号中也对这个做了一个大概的描述。先来看一下的图，下面是本人在纸上画的一张图：</p>
+</blockquote>
+<p><a href="http://hialan.com/wp-content/uploads/2014/05/photo-e1400045307987.jpg" target="_blank" rel="external"><img src="http://hialan.com/wp-content/uploads/2014/05/photo-e1400045307987-768x1024.jpg" alt=""></a></p>
+<p>HashMap使用了散列表这样一种结构，而在实现上实际使用了数组和链表的组合，所以兼具了数组和链表的优点。上图中左边部分就是一个数组，这个数组的每一项是一个单向链表。从图中可以看到对这个散列表的上做修改，实际上就是说对映射关系的添加删除或者更新操作，在这种情况下就必须保持外部的同步。也就是说如果两个线程同时去修改这个散列表，由于HashMap的内部实现没有做同步，最终可能导致数据被覆盖等很多问题。</p>
+<p>再从HashMap的源码来浅析它的实现，再分析一下它在多线程中可能会出现的问题。首先HashMap里面有如下几个常量：</p>
+<p>static final int MAXIMUM_CAPACITY = 1 &lt;&lt; 30;</p>
+<p>static final float DEFAULT_LOAD_FACTOR = 0.75f;<br>&nbsp;</p>
+<p>第一个表示默认的初始容量，第二个则表示最大的容量，第三个表示默认加载因子。HashMap提供了三个构造函数，其中无参构造函数使用了默认的容量和加载因子，其他两个则可以分别自定义容量或容量和负载因子。</p>
+<p>对于散列表数据的松散程度必须有一个合适度，即数据应该分布均匀，否则表容量太小而数据接近填满，势必hash碰撞的概率就会增大，这样继而链表也越长，对于添加数据和查询数据都很不利。表容量太大则会大大的浪费空间。上述HashMap中的加载因子DEFAULT_LOAD_FACTOR则是影响数据是否均匀一个重要的元素，它与表的容量和数据大小有这样一个关系，假设定义<img src="http://upload.wikimedia.org/math/b/c/c/bccfc7022dfb945174d9bcebad2297bb.png" alt="\alpha">为加载因子：</p>
+<blockquote>
+<p><img src="http://upload.wikimedia.org/math/b/c/c/bccfc7022dfb945174d9bcebad2297bb.png" alt="\alpha"> = 数据大小 / 散列表容量<br>可以看到加载因子太大就非常不利，所以在使用HashMap时应该尽可能估算出数据量，使用对应的构造函数。</p>
+</blockquote>
+<p>put方法是HashMap中重要的方法，它的代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">public V put(K key, V value) &#123;</div><div class="line">    if (key == null)</div><div class="line">        return putForNullKey(value);</div><div class="line">    int hash = hash(key.hashCode());</div><div class="line">    int i = indexFor(hash, table.length);</div><div class="line">    for (Entry&amp;lt;K,V&amp;gt; e = table[i]; e != null; e = e.next) &#123;</div><div class="line">        Object k;</div><div class="line">        if (e.hash == hash &amp;amp;&amp;amp; ((k = e.key) == key || key.equals(k))) &#123;</div><div class="line">            V oldValue = e.value;</div><div class="line">            e.value = value;</div><div class="line">            e.recordAccess(this);</div><div class="line">            return oldValue;</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line">    modCount++;</div><div class="line">    addEntry(hash, key, value, i);</div><div class="line">    return null;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>从这段代码可以看到，put方法会首先判断key是否为null，如果为null直接调用putForNullKey方法，从方法名字就可以看出是什么作用。不为null则继续执行，其中可以看到调用了方法addEntry，它的代码是这样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">void addEntry(int hash, K key, V value, int bucketIndex) &#123;</div><div class="line">    Entry&amp;lt;K,V&amp;gt; e = table[bucketIndex];</div><div class="line">    table[bucketIndex] = new Entry&amp;lt;K,V&amp;gt;(hash, key, value, e);</div><div class="line">    if (size++ &amp;gt;= threshold)</div><div class="line">        resize(2 * table.length);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>想象一下如果两个线程同时操作put，刚好这两个put的key发生了碰撞，那么根据HashMap的实现，两个线程会在同一个位置调用addEntry，并且同时得到了头结点，这样最终就会发生其中一个线程的put的数据被覆盖。</p>
+<p>在这个方法里可以看到也会调用另一个方法resize，resize方法的代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">void resize(int newCapacity) &#123;</div><div class="line">    Entry[] oldTable = table;</div><div class="line">    int oldCapacity = oldTable.length;</div><div class="line">    if (oldCapacity == MAXIMUM_CAPACITY) &#123;</div><div class="line">        threshold = Integer.MAX_VALUE;</div><div class="line">        return;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    Entry[] newTable = new Entry[newCapacity];</div><div class="line">    transfer(newTable);</div><div class="line">    table = newTable;</div><div class="line">    threshold = (int)(newCapacity * loadFactor);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个方法在散列表中的数据大于一个临界值时调用，用于扩展一个新的散列表。扩展一个新的散列表后，需要重新计算之前散列所有数据key的hash，并且再复制到新的散列表上。如果多个线程同时检测到超过临界值，这样就会发生多个线程同时扩展了自己的散列表，都在做rehash以及复制数据，结果就是最终只有一个线程的表赋给table，其他线程的均丢失且各自线程put的数据也丢失。并且当一个线程在做rehash和复制数据时，这是的table还是以前就的表，后来的线程就会继续操作旧的表，这样也会出现问题。</p>
+<p>从上述的分析可以看出多线程下HashMap主要会出现的问题，因此如果需要在多线程下使用HashMap，则应设计好程序，以防它会出现的问题。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2014/05/09/-e4-b8-ba-e4-bb-80-e4-b9-88hashmap-e6-98-af-e7-ba-bf-e7-a8-8b-e4-b8-8d-e5-ae-89-e5-85-a8-e7-9a-84/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

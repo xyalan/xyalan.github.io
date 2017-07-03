@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>密文保存用户密码的方式 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="在需要用户模块的项目中，对于用户密码的保存，一般不会使用明文保存，这样是不安全的。通常情况下，我们都需要对密码进行不可逆的加密，然后存放在数据库中。然后在用户登录的时候，把其输入的密码进行加密与数据库中存放的密文对比来判断密码是否正确。目前所使用比较多的是MD5，但是BCrypt也使用的比较多，相对来说BCrypt比MD5要安全一些，他的加密更慢。而且一般我们再对密码进行密文加密后，如果有人从数据">
+<meta property="og:type" content="article">
+<meta property="og:title" content="密文保存用户密码的方式">
+<meta property="og:url" content="http://yoursite.com/2013/08/01/-e5-af-86-e6-96-87-e4-bf-9d-e5-ad-98-e7-94-a8-e6-88-b7-e5-af-86-e7-a0-81-e7-9a-84-e6-96-b9-e5-bc-8f/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="在需要用户模块的项目中，对于用户密码的保存，一般不会使用明文保存，这样是不安全的。通常情况下，我们都需要对密码进行不可逆的加密，然后存放在数据库中。然后在用户登录的时候，把其输入的密码进行加密与数据库中存放的密文对比来判断密码是否正确。目前所使用比较多的是MD5，但是BCrypt也使用的比较多，相对来说BCrypt比MD5要安全一些，他的加密更慢。而且一般我们再对密码进行密文加密后，如果有人从数据">
+<meta property="og:updated_time" content="2017-07-03T15:40:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="密文保存用户密码的方式">
+<meta name="twitter:description" content="在需要用户模块的项目中，对于用户密码的保存，一般不会使用明文保存，这样是不安全的。通常情况下，我们都需要对密码进行不可逆的加密，然后存放在数据库中。然后在用户登录的时候，把其输入的密码进行加密与数据库中存放的密文对比来判断密码是否正确。目前所使用比较多的是MD5，但是BCrypt也使用的比较多，相对来说BCrypt比MD5要安全一些，他的加密更慢。而且一般我们再对密码进行密文加密后，如果有人从数据">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post--e5-af-86-e6-96-87-e4-bf-9d-e5-ad-98-e7-94-a8-e6-88-b7-e5-af-86-e7-a0-81-e7-9a-84-e6-96-b9-e5-bc-8f" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">密文保存用户密码的方式</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2013.08.01</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/服务器/">服务器</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2013/08/01/-e5-af-86-e6-96-87-e4-bf-9d-e5-ad-98-e7-94-a8-e6-88-b7-e5-af-86-e7-a0-81-e7-9a-84-e6-96-b9-e5-bc-8f/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>在需要用户模块的项目中，对于用户密码的保存，一般不会使用明文保存，这样是不安全的。通常情况下，我们都需要对密码进行不可逆的加密，然后存放在数据库中。然后在用户登录的时候，把其输入的密码进行加密与数据库中存放的密文对比来判断密码是否正确。<br>目前所使用比较多的是MD5，但是BCrypt也使用的比较多，相对来说BCrypt比MD5要安全一些，他的加密更慢。而且一般我们再对密码进行密文加密后，如果有人从数据库中拿到密码通过比对也容易找出对应的用户。因此我们在对密码机密时首先通过对密码的加密，然后在生成一个随机的salt，合并到一起存入数据库。对与使用BCrypt加密，首先下载BCypt的库，其实也就一个.java文件，把他放到项目中，在用户注册是对其提交过来的秘密加密，代码是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">String hash = BCrypt.hashpw(passwd, BCrypt.gensalt());</div></pre></td></tr></table></figure>
+<p>其中hash就是加密后的密码，passwd是提交过来的明文密码，把它存入数据库即可。</p>
+<p>用户登录时，把用户提交过来的密码和数据库中对应用户的密文密码同时传到BCrypt的方法checkpw中，方法返指是比较结果；</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">BCrypt.checkpw(passwd, hash);</div></pre></td></tr></table></figure>
+<p>这里第一个参数就是用户登录时输入的密码，hash就是经过加密存在数据库中的密文密码，方法结果是比较的结果，布尔型。对于对密码机密是，其中BCrypt.gensalt()其实就是得到一个随机的字符串，然后再和加密的密文合并在一起。<br>我们也可以自己来实现加密的方式，但是要记住在加密时最好分为两部分，第一就是对密码通过实现的加密方式加密，第二部分分为是在得到一个随机的字符串，也叫salt，俗称“佐料”。然后合并在一起，这样更加安全。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2013/08/01/-e5-af-86-e6-96-87-e4-bf-9d-e5-ad-98-e7-94-a8-e6-88-b7-e5-af-86-e7-a0-81-e7-9a-84-e6-96-b9-e5-bc-8f/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

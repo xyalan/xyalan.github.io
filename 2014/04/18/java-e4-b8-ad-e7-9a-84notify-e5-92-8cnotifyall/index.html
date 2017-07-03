@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>JAVA中的notify和notifyAll | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="翻阅JDK的文档，对这两个方法都有大段的描述。总结起来notify()用来唤醒正在waiting的任意单个线程，notifyAll()则用来唤醒所有waiting的线程。 在分析这两个方法可能遇到的问题之前，先记录一些基本的概念。线程在进入waiting状态时，对于对象的锁是释放掉的。同时要区分waiting状态和blocked状态，waiting状态是指线程被挂起需要被动唤醒；blocked状态">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JAVA中的notify和notifyAll">
+<meta property="og:url" content="http://yoursite.com/2014/04/18/java-e4-b8-ad-e7-9a-84notify-e5-92-8cnotifyall/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="翻阅JDK的文档，对这两个方法都有大段的描述。总结起来notify()用来唤醒正在waiting的任意单个线程，notifyAll()则用来唤醒所有waiting的线程。 在分析这两个方法可能遇到的问题之前，先记录一些基本的概念。线程在进入waiting状态时，对于对象的锁是释放掉的。同时要区分waiting状态和blocked状态，waiting状态是指线程被挂起需要被动唤醒；blocked状态">
+<meta property="og:updated_time" content="2017-07-03T15:40:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JAVA中的notify和notifyAll">
+<meta name="twitter:description" content="翻阅JDK的文档，对这两个方法都有大段的描述。总结起来notify()用来唤醒正在waiting的任意单个线程，notifyAll()则用来唤醒所有waiting的线程。 在分析这两个方法可能遇到的问题之前，先记录一些基本的概念。线程在进入waiting状态时，对于对象的锁是释放掉的。同时要区分waiting状态和blocked状态，waiting状态是指线程被挂起需要被动唤醒；blocked状态">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-java-e4-b8-ad-e7-9a-84notify-e5-92-8cnotifyall" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">JAVA中的notify和notifyAll</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2014.04.18</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/Java基础/">Java基础</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2014/04/18/java-e4-b8-ad-e7-9a-84notify-e5-92-8cnotifyall/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>翻阅JDK的文档，对这两个方法都有大段的描述。总结起来notify()用来唤醒正在waiting的任意单个线程，notifyAll()则用来唤醒所有waiting的线程。</p>
+<p>在分析这两个方法可能遇到的问题之前，先记录一些基本的概念。线程在进入waiting状态时，对于对象的锁是释放掉的。同时要区分waiting状态和blocked状态，waiting状态是指线程被挂起需要被动唤醒；blocked状态则是线程阻塞状态，在傻傻的主动排队等待轮到自己去做事儿。</p>
+<p><strong>notify()的使用</strong></p>
+<p>分析一下关于notify的使用，下面代码是一个简单生产者与消费者的列子：</p>
+<p><pre class="lang:java decode:true">package com.hialan.concurrent;</pre></p>
+<p>/**</p>
+<ul>
+<li><p>Created by Alan on 4/17/14.<br>*/<br>public class Producer implements Runnable {<br>  private StackQueue&lt;String&gt; stackQueue = null;</p>
+<p>  public Producer(StackQueue&lt;String&gt; stackQueue) {</p>
+<pre><code>this.stackQueue = stackQueue;
+</code></pre><p>  }</p>
+<p>  @Override<br>  public void run() {</p>
+<pre><code>for (int i = 0; i &amp;lt; 5; i++) {
+    stackQueue.put(String.valueOf(i));
+    System.out.println(&quot;produce:&quot; + i);
+}
+</code></pre><p>  }<br>}<br>&nbsp;<br><pre class="lang:java decode:true">package com.hialan.concurrent;</pre></p>
+</li>
+</ul>
+<p>/**</p>
+<ul>
+<li><p>Created by Alan on 4/17/14.<br>*/<br>public class Consumer implements Runnable {<br>  private StackQueue&lt;String&gt; stackQueue = null;</p>
+<p>  public Consumer(StackQueue&lt;String&gt; stackQueue) {</p>
+<pre><code>this.stackQueue = stackQueue;
+</code></pre><p>  }</p>
+<p>  @Override<br>  public void run() {</p>
+<pre><code>for (int i = 0; i &amp;lt; 5; i++) {
+    String str = stackQueue.get();
+    System.out.println(&quot;consume:&quot; + str);
+}
+</code></pre><p>  }<br>}<br><pre class="lang:java decode:true">package com.hialan.concurrent;</pre></p>
+</li>
+</ul>
+<p>import java.util.LinkedList;<br>import java.util.List;</p>
+<p>/**</p>
+<ul>
+<li><p>Created by Alan on 4/16/14.<br>*/<br>public class StackQueue&lt;T&gt; {<br>  private List&lt;T&gt; buffer = new LinkedList&lt;T&gt;();<br>  private int index = 0;</p>
+<p>  public synchronized void put(T o) {</p>
+<pre><code>while (index == buffer.size() - 1) {
+    try {
+        wait();
+
+    } catch (InterruptedException e) {
+
+        e.printStackTrace();
+    }
+}
+buffer.add(o);
+
+notify();
+index++;
+</code></pre><p>  }</p>
+<p>  public synchronized T get() {</p>
+<pre><code>while(index == 0) {
+    try {
+        wait();
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+}
+
+index--;
+T o = buffer.remove(index);
+notify();
+
+return o;
+</code></pre><p>  }<br>}<br>&nbsp;<br><pre class="lang:java decode:true  "> package com.hialan.concurrent;</pre></p>
+</li>
+</ul>
+<p>import java.util.concurrent.ExecutorService;<br>import java.util.concurrent.Executors;</p>
+<p>/**</p>
+<ul>
+<li><p>Created by Alan on 4/17/14.<br>*/<br>public class Client {<br>  public static void main(String[] args) {</p>
+<pre><code>StackQueue&amp;lt;String&amp;gt; s = new StackQueue&amp;lt;String&amp;gt;();
+
+Producer p1 = new Producer(s);
+Producer p2 = new Producer(s);
+Consumer c1 = new Consumer(s);
+Consumer c2 = new Consumer(s);
+
+ExecutorService pool = Executors.newFixedThreadPool(4);
+pool.execute(p1);
+pool.execute(p2);
+pool.execute(c1);
+pool.execute(c2);
+pool.shutdown();
+</code></pre><p>  }</p>
+</li>
+</ul>
+<p>}<br>&nbsp;</p>
+<p>这段代码首先用StackQueue完成了一个简单的仓库，Producer实现简单的生产者，往仓库里面放产品；Consumer实现了简单的消费，从仓库里面消费产品。创建两个生产者线程，分别叫P1和P2；两个消费者线程C1和C2。</p>
+<p>在仓库的两个notify()方法外面都加上了while循环，目的在于防止出现数组越界的异常。假设一开始C1进入get()同步方法中，此时的index为0也就是说buffer是空的，所以就顺理成章的进入了wait状态。此时恰好C2刚刚到达get()方法处，即它不是waiting状态也不是blocked状态；而同时P1又生产了一个对象放进了仓库并执行了notify()，这个时候C1被唤醒(正在waiting的只有C1一个)。由于C2刚刚到达get()方法处，C1又被唤醒了，此时C1和C2都试图去获取锁(进入wait之后会释放掉锁)。</p>
+<p>在这种狭路相逢勇者胜的时候，就看C1和C2谁厉害了。先不管谁厉害了，分别分析一下这俩获胜的结果。如果C1获胜，它继续往下执行完成释放锁，接着C2获得锁进入进入方法执行，一切OK。现在C2获得锁，C1就叫冤了，我刚刚被迷迷糊糊的叫醒，又被你抢得先机，早知道多睡会儿。C2吭哧吭哧做完了工作释放了锁，C1现在终于拿到锁了。假设在这期间仓库里面还是一个对象，现在已经被C2消费掉了，buffer现在是空的了，如果while判断buffer是为空，则C2接着wait()方法后面继续继续执行，这样就会发生数组越界的异常。</p>
+<p><strong>notify可能遇到的问题</strong></p>
+<p>上面分析了notify()的使用，下面看看notify()可能遇到的问题。虽然notify()可以唤醒任何一个waiting的线程，但具体是哪一个这是不确定的，并且多个线程在试图获取同一个锁时最终的顺序也是不确定的。这样如果产生不同的顺序，在使用notify()的时候就可能会出现一些问题。</p>
+<p>上一段代码并没有限制队列的大小，现在为了便于分析假设队列buffer最大时为1。假设分别有三个生产者和消费者线程，这样有这么一个执行顺序：</p>
+<ol>
+<li>P1进入put()方法放入一个元素，执行完之后退出；</li>
+<li>P2进入put()方法因为已经有一个元素，所以进入waiting；</li>
+<li>P3同P2一样也进入了waiting;</li>
+<li>C1进入get()方法，同时C2与C3也来争夺锁所以变为blocked，C1继续执行拿走一个元素并执行notify()之后退出；</li>
+<li>由于上一步的执行P2被唤醒了，但是C2已经在争夺锁，因此假设C2先拿到了锁，P2变成了又要去争夺锁，被挡在put()方法外；</li>
+<li>现在buffer中没有元素，C2虽然进入了get()方法却只能waiting释放了锁；</li>
+<li>假设P2倒霉还是被C3先抢到了锁，C3进入get()也变成waiting释放了锁；</li>
+<li>现在的情况是P3、C2、C3在waiting，P2这时终于拿到了锁执行完put()方法放入一个元素，同时它也执行了notify()；</li>
+<li>现在假设上一步的notify()唤醒了P3，但是它进入put()发现有元素然后执行wait()；<br>此时此刻看看，P3、C2、C3都在waiting，却没一个线程来notify，三个线程进入了死锁状态。</li>
+</ol>
+<p>如果换成了notifyAll()方法，在第4步中C1完了之后P2和P3都会被唤醒进入准备状态，即使后面C2和C3都进入了waiting，在第8步中P2执行完C2与C3又都被唤醒，这样始终都会有一个线程在运行状态。当然由这种情况导致的思索并不总是会发生，可能程序运行很久都不会出现，也可能第一次运行就出现了，这始终是一个非常大的风险。除非在程序设计的时候就能够很好的避免这种风险，否则我觉得还是尽量是用notifyAll()比较好。</p>
+<p>同时还有一点，在线程中同步问题中应该明白锁的对象是谁，谁持有了这个对象的锁。</p>
+<p>&nbsp;</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2014/04/18/java-e4-b8-ad-e7-9a-84notify-e5-92-8cnotifyall/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>贝叶斯定理引申 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="前几天看到池建强的一篇文章，科普了一下贝叶斯定理。之前看《黑客与画家》，里面有讲到了邮件过滤器，虽然并没有说明应用了贝叶斯定理，但现在一想这就是贝叶斯的定理的应用。《黑客与画家》刚好是阮一峰翻译的，找到他的博客关于贝叶斯定理的文章。 对这个数学定理研究过后，发现如果能对它有一个更深的理解，对于程序员来说是一份宝贵的知识。因为处在高速发展的互联网环境下，搜索、邮件过滤等应用都可以用贝叶斯定理来更好的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="贝叶斯定理引申">
+<meta property="og:url" content="http://yoursite.com/2014/05/20/-e8-b4-9d-e5-8f-b6-e6-96-af-e5-ae-9a-e7-90-86-e5-bc-95-e7-94-b3/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="前几天看到池建强的一篇文章，科普了一下贝叶斯定理。之前看《黑客与画家》，里面有讲到了邮件过滤器，虽然并没有说明应用了贝叶斯定理，但现在一想这就是贝叶斯的定理的应用。《黑客与画家》刚好是阮一峰翻译的，找到他的博客关于贝叶斯定理的文章。 对这个数学定理研究过后，发现如果能对它有一个更深的理解，对于程序员来说是一份宝贵的知识。因为处在高速发展的互联网环境下，搜索、邮件过滤等应用都可以用贝叶斯定理来更好的">
+<meta property="og:image" content="http://hialan.com/wp-content/uploads/2014/05/image.jpg">
+<meta property="og:updated_time" content="2017-07-03T15:40:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="贝叶斯定理引申">
+<meta name="twitter:description" content="前几天看到池建强的一篇文章，科普了一下贝叶斯定理。之前看《黑客与画家》，里面有讲到了邮件过滤器，虽然并没有说明应用了贝叶斯定理，但现在一想这就是贝叶斯的定理的应用。《黑客与画家》刚好是阮一峰翻译的，找到他的博客关于贝叶斯定理的文章。 对这个数学定理研究过后，发现如果能对它有一个更深的理解，对于程序员来说是一份宝贵的知识。因为处在高速发展的互联网环境下，搜索、邮件过滤等应用都可以用贝叶斯定理来更好的">
+<meta name="twitter:image" content="http://hialan.com/wp-content/uploads/2014/05/image.jpg">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post--e8-b4-9d-e5-8f-b6-e6-96-af-e5-ae-9a-e7-90-86-e5-bc-95-e7-94-b3" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">贝叶斯定理引申</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2014.05.20</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/其他/">其他</a> / <a class="article-category-link" href="/categories/其他/算法/">算法</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2014/05/20/-e8-b4-9d-e5-8f-b6-e6-96-af-e5-ae-9a-e7-90-86-e5-bc-95-e7-94-b3/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>前几天看到池建强的一篇文章，科普了一下贝叶斯定理。之前看《黑客与画家》，里面有讲到了邮件过滤器，虽然并没有说明应用了贝叶斯定理，但现在一想这就是贝叶斯的定理的应用。《黑客与画家》刚好是阮一峰翻译的，找到他的博客关于贝叶斯定理的文章。</p>
+<p>对这个数学定理研究过后，发现如果能对它有一个更深的理解，对于程序员来说是一份宝贵的知识。因为处在高速发展的互联网环境下，搜索、邮件过滤等应用都可以用贝叶斯定理来更好的实现。</p>
+<p>如同以前学的各种物理、数学定理一样命名一样，贝叶斯定理也是由同名英国数学家Thomas Bayes于1763年提出。贝叶斯定理时概率论中的一个结论，它跟随机变量的条件概率以及边缘概率分布有关。条件概率顾名思义就是事件A在另外一个事件B已经发生条件下的发生概率，表示为P(A|B)。</p>
+<p>贝叶斯定理时一个公式，这个公式为：</p>
+<p><a href="http://hialan.com/wp-content/uploads/2014/05/image.jpg" target="_blank" rel="external"><img src="http://hialan.com/wp-content/uploads/2014/05/image.jpg" alt="image"></a></p>
+<p>&nbsp;</p>
+<p>在这个公式中，P(A) 时A的先验概率，P(B)是B的先验概率，P(A|B)是A的后验概率，P(B|A)是B的后验概率。并且后验概率与先验概率和相似度的乘积成正比。</p>
+<p>待续。。。。。。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2014/05/20/-e8-b4-9d-e5-8f-b6-e6-96-af-e5-ae-9a-e7-90-86-e5-bc-95-e7-94-b3/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

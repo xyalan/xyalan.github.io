@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>Apache2.x启用gzip压缩 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="最近公司作为供应商为去哪儿提供酒店预订，需要开发酒店的接口，其中有要求这边服务器需要开启gzip压缩。以前倒腾过nginx，知道它的gzip怎么启用，但对apache真是一无所知。在网上搜索了大半天，很多文章都是大同小异，根本在配置文件找不到所说的配置选项。不过最终经过英文搜索，再加上官方的文档，总结一下开启的过程。 首先，在apache2.0以前需要使用第三方模块来支持压缩，而之后apache以">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Apache2.x启用gzip压缩">
+<meta property="og:url" content="http://yoursite.com/2013/12/19/apache2-x-e5-90-af-e7-94-a8gzip-e5-8e-8b-e7-bc-a9/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="最近公司作为供应商为去哪儿提供酒店预订，需要开发酒店的接口，其中有要求这边服务器需要开启gzip压缩。以前倒腾过nginx，知道它的gzip怎么启用，但对apache真是一无所知。在网上搜索了大半天，很多文章都是大同小异，根本在配置文件找不到所说的配置选项。不过最终经过英文搜索，再加上官方的文档，总结一下开启的过程。 首先，在apache2.0以前需要使用第三方模块来支持压缩，而之后apache以">
+<meta property="og:updated_time" content="2017-07-03T15:40:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Apache2.x启用gzip压缩">
+<meta name="twitter:description" content="最近公司作为供应商为去哪儿提供酒店预订，需要开发酒店的接口，其中有要求这边服务器需要开启gzip压缩。以前倒腾过nginx，知道它的gzip怎么启用，但对apache真是一无所知。在网上搜索了大半天，很多文章都是大同小异，根本在配置文件找不到所说的配置选项。不过最终经过英文搜索，再加上官方的文档，总结一下开启的过程。 首先，在apache2.0以前需要使用第三方模块来支持压缩，而之后apache以">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-apache2-x-e5-90-af-e7-94-a8gzip-e5-8e-8b-e7-bc-a9" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">Apache2.x启用gzip压缩</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2013.12.19</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/服务器/">服务器</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2013/12/19/apache2-x-e5-90-af-e7-94-a8gzip-e5-8e-8b-e7-bc-a9/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>最近公司作为供应商为去哪儿提供酒店预订，需要开发酒店的接口，其中有要求这边服务器需要开启gzip压缩。以前倒腾过nginx，知道它的gzip怎么启用，但对apache真是一无所知。在网上搜索了大半天，很多文章都是大同小异，根本在配置文件找不到所说的配置选项。不过最终经过英文搜索，再加上官方的文档，总结一下开启的过程。</p>
+<p>首先，在apache2.0以前需要使用第三方模块来支持压缩，而之后apache以及内置了模块mod_deflate来支持压缩。所以先确定在编译安装apache的时候是否安装了这个模块。使用下列命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/apache_directory/bin/apachectl -t -D DUMP_MODULES</div></pre></td></tr></table></figure>
+<p>如果能在输出列表看到deflate_module (static)，则说明已经加载了该模块。你也可以使用命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/apache_directory/bin/apachectl -l</div></pre></td></tr></table></figure>
+<p>查看输出是否包含该模块儿，表示apache已经内置了该模块儿。还可以使用:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/apache_directory/bin/httpd -M&lt;/pre&gt;</div></pre></td></tr></table></figure>
+<p>查看输出列表是否包含deflate_module (static)来确定是否加载该模块儿。</p>
+<p>接下来，加上已经确定包含了deflate_module模块儿，那么只需修改apache的文件重启即可。找到httpd.conf文件并打开，找下列代码段：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&lt;IfModule deflate_module&gt;</div><div class="line"></div><div class="line">DeflateBufferSize 8096</div><div class="line">DeflateCompressionLevel 9</div><div class="line">DeflateMemLevel 9</div><div class="line">DeflateWindowSize 15</div><div class="line"></div><div class="line">AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/x-httpd-php application/x-javascript</div><div class="line">AddOutputFilterByType INFLATE image/png image/gif image/jpeg</div><div class="line">SetInputFilter DEFLATE</div><div class="line">&lt;/IfModule&gt;</div></pre></td></tr></table></figure>
+<p>前面应该有#号，去掉#号并保存。默认配置文件里面应该有这段，如果没有则手动加上此段。</p>
+<p>最后就是重启apache，关于重启可以参考<a href="http://apache.chinahtml.com/stopping.html" target="_blank" rel="external">http://apache.chinahtml.com/stopping.html</a></p>
+<p>可以使用kill命令或者apache中可执行文件httpd或者apachectl， 我使用的是命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">apachectl -k graceful</div></pre></td></tr></table></figure>
+<p>也就是优雅的重启方式，其实就是等待已有任务的进程完成任务后再重启。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2013/12/19/apache2-x-e5-90-af-e7-94-a8gzip-e5-8e-8b-e7-bc-a9/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

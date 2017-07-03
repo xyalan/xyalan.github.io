@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>Emacs配置golang | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="一直以来都在学习Emacs，只不过总是断断续续的。常说要学好就要不断的去用，平常写 JAVA 代码也都是 IDE，偶尔对单个文件的修改也都是图方便只在终端利用 Vim。最近刚好在学些 Go 语言，觉得刚好能有机会常用 Emacs了。 初学 Go 语言，先不说要求自动补全这些了，代码高亮还是需要的。Go 的官方有提供 Emacs 的扩展，打开 Google 直接搜索就能首条就能看到。这里记录一些自己">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Emacs配置golang">
+<meta property="og:url" content="http://yoursite.com/2014/07/12/emacs-e9-85-8d-e7-bd-ae-golang/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="一直以来都在学习Emacs，只不过总是断断续续的。常说要学好就要不断的去用，平常写 JAVA 代码也都是 IDE，偶尔对单个文件的修改也都是图方便只在终端利用 Vim。最近刚好在学些 Go 语言，觉得刚好能有机会常用 Emacs了。 初学 Go 语言，先不说要求自动补全这些了，代码高亮还是需要的。Go 的官方有提供 Emacs 的扩展，打开 Google 直接搜索就能首条就能看到。这里记录一些自己">
+<meta property="og:updated_time" content="2017-07-03T15:40:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Emacs配置golang">
+<meta name="twitter:description" content="一直以来都在学习Emacs，只不过总是断断续续的。常说要学好就要不断的去用，平常写 JAVA 代码也都是 IDE，偶尔对单个文件的修改也都是图方便只在终端利用 Vim。最近刚好在学些 Go 语言，觉得刚好能有机会常用 Emacs了。 初学 Go 语言，先不说要求自动补全这些了，代码高亮还是需要的。Go 的官方有提供 Emacs 的扩展，打开 Google 直接搜索就能首条就能看到。这里记录一些自己">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-emacs-e9-85-8d-e7-bd-ae-golang" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">Emacs配置golang</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2014.07.12</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/其他/">其他</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2014/07/12/emacs-e9-85-8d-e7-bd-ae-golang/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>一直以来都在学习Emacs，只不过总是断断续续的。常说要学好就要不断的去用，平常写 JAVA 代码也都是 IDE，偶尔对单个文件的修改也都是图方便只在终端利用 Vim。最近刚好在学些 Go 语言，觉得刚好能有机会常用 Emacs了。</p>
+<p>初学 Go 语言，先不说要求自动补全这些了，代码高亮还是需要的。Go 的官方有提供 Emacs 的扩展，打开 Google 直接搜索就能首条就能看到。这里记录一些自己的配置。我用的是 Github 上一位朋友提供的 mode。<a href="http://dominik.honnef.co/posts/2013/03/writing_go_in_emacs/" target="_blank" rel="external">这里</a>也已经有说明怎么使用。</p>
+<ul>
+<li>首先新建目录，从<a href="https://github.com/dominikh/go-mode.el" target="_blank" rel="external"> Github</a> 上面clone下来go-mode.el:</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">mkdir -p ~/My/emacs &amp;&amp; cd ~/My/emacs</div><div class="line"></div><div class="line">git clone git@github.com:dominikh/go-mode.el.git</div></pre></td></tr></table></figure>
+<ul>
+<li>打开 Emacs，并运行下面命令，之后根据提示再输入go-mode.el 文件(包括目录):</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">M-x update-file-autoloads</div></pre></td></tr></table></figure>
+<ul>
+<li><p>上述操作实际上是生成 go-mode-load.el 文件，根据上述操作完成之后，请在输入go-mode-load.el并指名目录</p>
+</li>
+<li><p>接着在.emacs 文件中添加配置:</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">(add-to-list &apos;load-path &quot;~/My/emacs/go-mode.el/&quot;)</div><div class="line">(require &apos;go-mode-load)</div></pre></td></tr></table></figure>
+<p>这样就已经完成配置。退出后重新启动，打开一个 Go 的文件，会发现代码已经高亮。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2014/07/12/emacs-e9-85-8d-e7-bd-ae-golang/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

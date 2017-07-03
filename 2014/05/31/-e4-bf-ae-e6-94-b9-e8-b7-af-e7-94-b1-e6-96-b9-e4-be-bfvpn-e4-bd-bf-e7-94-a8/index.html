@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>修改路由方便VPN使用 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="对于码农来说，科学上网是必不可少。一直使用的是Goagent，但这种方式还是不稳定，也比较折腾。毕竟效率为先，对于上述方式知道其原理和使用方式就好。 一个好的VPN速度相对不错且稳定，也省去了很多麻烦。但其也有一缺点，连接VPN之后，所有流量都要走VPN，访问国内网站速度又会慢一些。尤其我自己用的付费VPN，有流量限制，若p2p下载还会遭遇被封的后果，来回切换就比较麻烦了。 所谓条条大路通罗马，在">
+<meta property="og:type" content="article">
+<meta property="og:title" content="修改路由方便VPN使用">
+<meta property="og:url" content="http://yoursite.com/2014/05/31/-e4-bf-ae-e6-94-b9-e8-b7-af-e7-94-b1-e6-96-b9-e4-be-bfvpn-e4-bd-bf-e7-94-a8/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="对于码农来说，科学上网是必不可少。一直使用的是Goagent，但这种方式还是不稳定，也比较折腾。毕竟效率为先，对于上述方式知道其原理和使用方式就好。 一个好的VPN速度相对不错且稳定，也省去了很多麻烦。但其也有一缺点，连接VPN之后，所有流量都要走VPN，访问国内网站速度又会慢一些。尤其我自己用的付费VPN，有流量限制，若p2p下载还会遭遇被封的后果，来回切换就比较麻烦了。 所谓条条大路通罗马，在">
+<meta property="og:updated_time" content="2017-07-03T15:40:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="修改路由方便VPN使用">
+<meta name="twitter:description" content="对于码农来说，科学上网是必不可少。一直使用的是Goagent，但这种方式还是不稳定，也比较折腾。毕竟效率为先，对于上述方式知道其原理和使用方式就好。 一个好的VPN速度相对不错且稳定，也省去了很多麻烦。但其也有一缺点，连接VPN之后，所有流量都要走VPN，访问国内网站速度又会慢一些。尤其我自己用的付费VPN，有流量限制，若p2p下载还会遭遇被封的后果，来回切换就比较麻烦了。 所谓条条大路通罗马，在">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post--e4-bf-ae-e6-94-b9-e8-b7-af-e7-94-b1-e6-96-b9-e4-be-bfvpn-e4-bd-bf-e7-94-a8" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">修改路由方便VPN使用</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2014.05.31</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/其他/">其他</a> / <a class="article-category-link" href="/categories/其他/操作系统/">操作系统</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2014/05/31/-e4-bf-ae-e6-94-b9-e8-b7-af-e7-94-b1-e6-96-b9-e4-be-bfvpn-e4-bd-bf-e7-94-a8/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>对于码农来说，科学上网是必不可少。一直使用的是Goagent，但这种方式还是不稳定，也比较折腾。毕竟效率为先，对于上述方式知道其原理和使用方式就好。</p>
+<p>一个好的VPN速度相对不错且稳定，也省去了很多麻烦。但其也有一缺点，连接VPN之后，所有流量都要走VPN，访问国内网站速度又会慢一些。尤其我自己用的付费VPN，有流量限制，若p2p下载还会遭遇被封的后果，来回切换就比较麻烦了。</p>
+<p>所谓条条大路通罗马，在网络当中也是一样。一个数据包发送到目的地要经过不同的节点，这个路径有多条，路由表是选择路径的依据。恰巧最近在研究分布式系统，所以对“路由”这个次接触也比较多。根据这个原理，可以适当的修改路由信息，让国内请求都不经过VPN。</p>
+<p>自己用的是MacBook，因此在OS X系统下：</p>
+<p>1.首先下载<a href="https://github.com/fivesheep/chnroutes" target="_blank" rel="external">chnroutes.py</a>,这是一个写好的脚本，用于在连接VPN之后修改本地的路由信息；</p>
+<p>2.解压之后，进入目录，使用下列命令生成两个文件<strong>ip-up</strong>和<strong>ip-down</strong>:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">python chnroutes.py -p mac</div></pre></td></tr></table></figure>
+<p>3.复制生的两个文件到/etc/ppp目录下；</p>
+<p>4.为这两个文件增加权限，并修改为可执行文件；</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo chmod a+x ip-up ip-down</div></pre></td></tr></table></figure>
+<p>这样就就成功了，分别在连接VPN与断开VPN时使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">netstat -nr</div></pre></td></tr></table></figure>
+<p>查看路由表信息有什么变化。当然也可是实际验证，分别打开<a href="http://ip.qq.com/" target="_blank" rel="external">http://ip.qq.com/</a>和<a href="http://www.ipchicken.com/" target="_blank" rel="external">http://www.ipchicken.com/</a>，会看到本地ip是不同的，这说说明修改生效。</p>
+<p>另，此方法适用于是用PPTP方式的VPN连接。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2014/05/31/-e4-bf-ae-e6-94-b9-e8-b7-af-e7-94-b1-e6-96-b9-e4-be-bfvpn-e4-bd-bf-e7-94-a8/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

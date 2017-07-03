@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>SSH命令的简单使用 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="SSH(Secure Shell)是建立在应用层和传输层基础上的一种安全协议，主要用于远程登录会话和为其他网络服务提供安全性的协议。它的有点主要是对所有传输的数据加密，且传输的数据可以是压缩的。SSH的功能即可以替代Telnet，也可以为FTP、POP等提供安全通道。 由于自己有VPS，以前公司的服务器也有过维护，所以对SSH还算了解一些。主要用做远程登录，另外也有用过SSH提供的安全通道实现科学">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SSH命令的简单使用">
+<meta property="og:url" content="http://yoursite.com/2014/06/05/ssh-e5-91-bd-e4-bb-a4-e7-9a-84-e7-ae-80-e5-8d-95-e4-bd-bf-e7-94-a8/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="SSH(Secure Shell)是建立在应用层和传输层基础上的一种安全协议，主要用于远程登录会话和为其他网络服务提供安全性的协议。它的有点主要是对所有传输的数据加密，且传输的数据可以是压缩的。SSH的功能即可以替代Telnet，也可以为FTP、POP等提供安全通道。 由于自己有VPS，以前公司的服务器也有过维护，所以对SSH还算了解一些。主要用做远程登录，另外也有用过SSH提供的安全通道实现科学">
+<meta property="og:updated_time" content="2017-07-03T15:40:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SSH命令的简单使用">
+<meta name="twitter:description" content="SSH(Secure Shell)是建立在应用层和传输层基础上的一种安全协议，主要用于远程登录会话和为其他网络服务提供安全性的协议。它的有点主要是对所有传输的数据加密，且传输的数据可以是压缩的。SSH的功能即可以替代Telnet，也可以为FTP、POP等提供安全通道。 由于自己有VPS，以前公司的服务器也有过维护，所以对SSH还算了解一些。主要用做远程登录，另外也有用过SSH提供的安全通道实现科学">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-ssh-e5-91-bd-e4-bb-a4-e7-9a-84-e7-ae-80-e5-8d-95-e4-bd-bf-e7-94-a8" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">SSH命令的简单使用</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2014.06.05</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/其他/">其他</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2014/06/05/ssh-e5-91-bd-e4-bb-a4-e7-9a-84-e7-ae-80-e5-8d-95-e4-bd-bf-e7-94-a8/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>SSH(Secure Shell)是建立在应用层和传输层基础上的一种安全协议，主要用于远程登录会话和为其他网络服务提供安全性的协议。它的有点主要是对所有传输的数据加密，且传输的数据可以是压缩的。SSH的功能即可以替代Telnet，也可以为FTP、POP等提供安全通道。</p>
+<p>由于自己有VPS，以前公司的服务器也有过维护，所以对SSH还算了解一些。主要用做远程登录，另外也有用过SSH提供的安全通道实现科学上网。在UNIX/Linux系的系统中，通常都有内置SSH的实现。Windows下自己用过比较简单的putty，在做服务器的维护时主要是用<a href="http://www.netsarang.com/products/xsh_overview.html" target="_blank" rel="external">Xshell</a>。</p>
+<p>##密码登录</p>
+<p>经常远程登录，使用最多的命令为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh user@host</div></pre></td></tr></table></figure>
+<p>当然如果本地用户名与远程登录的用户名相同，那更简单：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh host</div></pre></td></tr></table></figure>
+<p>上述命令省略了端口号，因为默认SSH端口号为22。指定端口号登录：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh -p port user@host</div></pre></td></tr></table></figure>
+<p>如果是第一次登录远程计算机，则会提示：</p>
+<blockquote>
+<p>The authenticity of host ‘[101.226.241.185]:11717 ([101.226.241.185]:11717)’ can’t be established.</p>
+<p>RSA key fingerprint is 8d:94:86:b7:97:c0:2f:85:36:97:d3:1f:66:a2:b7:82.</p>
+<p>Are you sure you want to continue connecting (yes/no)?<br>大致是说远程主机的真实性无法确认，只知道公钥的签名是后面那一串，询问是否继续。如果确认便会在用户目录的.ssh目录下的known_hosts文件添加公钥，内容包含了远程主机的地址和公钥串。如果登录不同的主机，都会在这个文件分别添加公钥。登录完成之后就像在本地操作一样了。</p>
+</blockquote>
+<p>##免密码登录</p>
+<p>上面登录都需要是用密码，SSH也可以面密码登录。面密码登录也就是使用公钥认证，原理涉及到现代密码学的问题。首先在本地生成私钥：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh-keygen -b 1024 -t dsa</div></pre></td></tr></table></figure>
+<p>参数-b指定了公钥的长度，-t dsa表示生成公有和私有的密钥对，可以使用-t rsa生车功能一个密钥。da默认长度1024bit，rsa默认长度2048bit，因此可以不使用参数-b指定长度。另可以是用-f name指定密钥的名字。</p>
+<p>在生成的过程中，会有很多提示包括需要存放的地址、是否是用密码短句等需要确认。其中密码短句表示如果有人拿到私钥，没有密码短句也没法使用，一般还是设置比较好。</p>
+<p>完了之后需要复制公钥到远程主机，又可使用命令:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh-copy-id -i ~/.ssh/id_dsa.pub</div></pre></td></tr></table></figure>
+<p>这样就完成了公钥认证。但是如果在生成密钥时加了密码短语，那么需要在登录时需要输入密码短语对密钥解密，这样还是没有完成免密码登录。不过可以使用SSH代理，它可以帮记住密码短语。OpenSSH是SSH协议的实现，UNIX/Linux系的系统默认都是安装的这个，这个实现里默认也包含了SSH的代理ssh-agent。</p>
+<p>直接运行ssh-agent命令会输出它使用的环境和变量，用到这些变量需要使用eval：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">eval &apos;ssh-agent&apos;</div></pre></td></tr></table></figure>
+<p>上述实际就是运行了代理，添加到环境变量里，这样启动shell时就会自动运行:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">echo &apos;eval `ssh-agent`&apos; &gt;&gt; ~/.bash_profile</div></pre></td></tr></table></figure>
+<p>其中引号第一对是单引号，第二对是MacBook键盘1左边的那个按键。ssh-agent运行之后需要知道密钥对在哪儿，因此还需要做一步。使用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh-add ~/.ssh/id_agent</div></pre></td></tr></table></figure>
+<p>接着输入密码短句，现在就可以免密码且密钥是安全的。</p>
+<p>##另一种使用<br>SSH登录到远程主机之后就可以操作了，但还有另一种方式，不用登录远程主机而直接在本地远程操作。例如想查看远程主机有没有运行nginx，直接使用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">user@host &apos;ps -ax | grep nginx&apos;</div></pre></td></tr></table></figure>
+<p>这样就不用登录远程主机，而像在本地操作一样，但事实上操作的远程主机。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2014/06/05/ssh-e5-91-bd-e4-bb-a4-e7-9a-84-e7-ae-80-e5-8d-95-e4-bd-bf-e7-94-a8/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

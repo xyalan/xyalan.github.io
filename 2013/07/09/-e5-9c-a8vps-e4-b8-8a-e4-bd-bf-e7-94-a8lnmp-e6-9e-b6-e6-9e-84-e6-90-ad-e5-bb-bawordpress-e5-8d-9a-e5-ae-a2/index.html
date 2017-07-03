@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>在vps上使用lnmp架构搭建wordpress博客 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="这年年头如果连自己个一个网站没有，你出去都不好意思说你是做技术的。就想一个程序员一样，如果你告诉别人你不会解决一些电脑的小毛病，你那就等着众人的鄙视目光吧。 以前自己曾弄过一个虚拟空间，还是window server的。在上面搭建过一个wordrpess，但是由于是虚拟空间，什么东西都是现成的，并且还非常不稳定，访问速度奇慢。来也就没了兴趣，渐渐的也就不管了，再后来到期了什么东西都没了。 自己也一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在vps上使用lnmp架构搭建wordpress博客">
+<meta property="og:url" content="http://yoursite.com/2013/07/09/-e5-9c-a8vps-e4-b8-8a-e4-bd-bf-e7-94-a8lnmp-e6-9e-b6-e6-9e-84-e6-90-ad-e5-bb-bawordpress-e5-8d-9a-e5-ae-a2/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="这年年头如果连自己个一个网站没有，你出去都不好意思说你是做技术的。就想一个程序员一样，如果你告诉别人你不会解决一些电脑的小毛病，你那就等着众人的鄙视目光吧。 以前自己曾弄过一个虚拟空间，还是window server的。在上面搭建过一个wordrpess，但是由于是虚拟空间，什么东西都是现成的，并且还非常不稳定，访问速度奇慢。来也就没了兴趣，渐渐的也就不管了，再后来到期了什么东西都没了。 自己也一">
+<meta property="og:updated_time" content="2017-07-03T15:40:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在vps上使用lnmp架构搭建wordpress博客">
+<meta name="twitter:description" content="这年年头如果连自己个一个网站没有，你出去都不好意思说你是做技术的。就想一个程序员一样，如果你告诉别人你不会解决一些电脑的小毛病，你那就等着众人的鄙视目光吧。 以前自己曾弄过一个虚拟空间，还是window server的。在上面搭建过一个wordrpess，但是由于是虚拟空间，什么东西都是现成的，并且还非常不稳定，访问速度奇慢。来也就没了兴趣，渐渐的也就不管了，再后来到期了什么东西都没了。 自己也一">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post--e5-9c-a8vps-e4-b8-8a-e4-bd-bf-e7-94-a8lnmp-e6-9e-b6-e6-9e-84-e6-90-ad-e5-bb-bawordpress-e5-8d-9a-e5-ae-a2" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">在vps上使用lnmp架构搭建wordpress博客</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2013.07.09</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/服务器/">服务器</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2013/07/09/-e5-9c-a8vps-e4-b8-8a-e4-bd-bf-e7-94-a8lnmp-e6-9e-b6-e6-9e-84-e6-90-ad-e5-bb-bawordpress-e5-8d-9a-e5-ae-a2/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>这年年头如果连自己个一个网站没有，你出去都不好意思说你是做技术的。就想一个程序员一样，如果你告诉别人你不会解决一些电脑的小毛病，你那就等着众人的鄙视目光吧。</p>
+<p>以前自己曾弄过一个虚拟空间，还是window server的。在上面搭建过一个wordrpess，但是由于是虚拟空间，什么东西都是现成的，并且还非常不稳定，访问速度奇慢。来也就没了兴趣，渐渐的也就不管了，再后来到期了什么东西都没了。</p>
+<p>自己也一直都想买个vps，但都是存在于脑袋里。这次公司刚好把服务的维护交由我管理，所以就下下定决心买了vps。买了vps，自然不能浪费这个。</p>
+<p>现在就开始说说我搭建的过程吧。</p>
+<p>首先，应该选择架构，现在比较流行的也就是lamp和lnmp，而我们公司使用的服务器是nginx，所以我也就选择了lnmp。可以选择nginx、mysql、php分别的单个安装，只是这样包括配置都很繁琐。好在现在大牛给我们提供了方便，他们写的lnmp的一键安装包脚本大大节省了这种繁琐，当然如果你是想熟悉安装方法那就不要选择这个了。</p>
+<p>现在网上lnmp的一键安装包脚本有很多，我选择是<a href="http://lnmp.org/这个网站上的。安装步骤，这个网站上写的很清楚。安装完成之后，需要建立站点的目录，以及绑定域名。这个大神也提供了脚本，http://lnmp.org/faq/lnmp-vhost-add-howto.html这个地址也讲的很清楚。如果想深入的了解一下这个配置，选择手动的建立目录，然后修改nginx的nginx.conf配置文件，找到其中的server，修改里面的内容即可。" target="_blank" rel="external">http://lnmp.org/这个网站上的。安装步骤，这个网站上写的很清楚。安装完成之后，需要建立站点的目录，以及绑定域名。这个大神也提供了脚本，http://lnmp.org/faq/lnmp-vhost-add-howto.html这个地址也讲的很清楚。如果想深入的了解一下这个配置，选择手动的建立目录，然后修改nginx的nginx.conf配置文件，找到其中的server，修改里面的内容即可。</a></p>
+<p>这里要说一下我遇到的问题，由于我有四个域名，所以我想使用其中的两个在vps上搭建两个相互独立的博客。如果选择数据库也相互独立，则不需要修改wordpress的任何东西。而我选择的是搭建两个相互独立的wordpress，但是数据库死后共享的。所以需要分别修改连个wordpress里面wp-config.php其中$table_prefix后面的值，是两个wordpress各不相同，这样才能区分开。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2013/07/09/-e5-9c-a8vps-e4-b8-8a-e4-bd-bf-e7-94-a8lnmp-e6-9e-b6-e6-9e-84-e6-90-ad-e5-bb-bawordpress-e5-8d-9a-e5-ae-a2/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

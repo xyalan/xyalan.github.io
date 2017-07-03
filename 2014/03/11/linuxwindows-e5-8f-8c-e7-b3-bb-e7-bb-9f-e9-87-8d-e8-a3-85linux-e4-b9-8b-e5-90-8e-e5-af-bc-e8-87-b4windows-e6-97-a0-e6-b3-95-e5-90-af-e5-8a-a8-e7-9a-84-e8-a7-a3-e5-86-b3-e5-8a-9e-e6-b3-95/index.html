@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>Linux+Windows双系统重装Linux之后导致Windows无法启动的解决办法 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="电脑上本来装的是Windows7和Ubuntu双系统，今天有时间就把上次下载的Fedora16刻盘，想把Ubuntu换成Fedora16。 岂料在装Fedora的过程中，在选择存储设备时误选了“替换本机上已有Linux”的选项。将错就错继续，进行到映像文件复制到磁盘阶段，就是提示“检测已有Linux分区的文件系统失败”，没仔细看就点选择返回进行重新安装。 这一次自然选择了自己分配磁盘空间，可是进入">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux+Windows双系统重装Linux之后导致Windows无法启动的解决办法">
+<meta property="og:url" content="http://yoursite.com/2014/03/11/linuxwindows-e5-8f-8c-e7-b3-bb-e7-bb-9f-e9-87-8d-e8-a3-85linux-e4-b9-8b-e5-90-8e-e5-af-bc-e8-87-b4windows-e6-97-a0-e6-b3-95-e5-90-af-e5-8a-a8-e7-9a-84-e8-a7-a3-e5-86-b3-e5-8a-9e-e6-b3-95/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="电脑上本来装的是Windows7和Ubuntu双系统，今天有时间就把上次下载的Fedora16刻盘，想把Ubuntu换成Fedora16。 岂料在装Fedora的过程中，在选择存储设备时误选了“替换本机上已有Linux”的选项。将错就错继续，进行到映像文件复制到磁盘阶段，就是提示“检测已有Linux分区的文件系统失败”，没仔细看就点选择返回进行重新安装。 这一次自然选择了自己分配磁盘空间，可是进入">
+<meta property="og:updated_time" content="2017-07-03T15:40:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux+Windows双系统重装Linux之后导致Windows无法启动的解决办法">
+<meta name="twitter:description" content="电脑上本来装的是Windows7和Ubuntu双系统，今天有时间就把上次下载的Fedora16刻盘，想把Ubuntu换成Fedora16。 岂料在装Fedora的过程中，在选择存储设备时误选了“替换本机上已有Linux”的选项。将错就错继续，进行到映像文件复制到磁盘阶段，就是提示“检测已有Linux分区的文件系统失败”，没仔细看就点选择返回进行重新安装。 这一次自然选择了自己分配磁盘空间，可是进入">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-linuxwindows-e5-8f-8c-e7-b3-bb-e7-bb-9f-e9-87-8d-e8-a3-85linux-e4-b9-8b-e5-90-8e-e5-af-bc-e8-87-b4windows-e6-97-a0-e6-b3-95-e5-90-af-e5-8a-a8-e7-9a-84-e8-a7-a3-e5-86-b3-e5-8a-9e-e6-b3-95" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">Linux+Windows双系统重装Linux之后导致Windows无法启动的解决办法</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2014.03.11</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/操作系统/">操作系统</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2014/03/11/linuxwindows-e5-8f-8c-e7-b3-bb-e7-bb-9f-e9-87-8d-e8-a3-85linux-e4-b9-8b-e5-90-8e-e5-af-bc-e8-87-b4windows-e6-97-a0-e6-b3-95-e5-90-af-e5-8a-a8-e7-9a-84-e8-a7-a3-e5-86-b3-e5-8a-9e-e6-b3-95/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>电脑上本来装的是Windows7和Ubuntu双系统，今天有时间就把上次下载的Fedora16刻盘，想把Ubuntu换成Fedora16。</p>
+<p>岂料在装Fedora的过程中，在选择存储设备时误选了“替换本机上已有Linux”的选项。将错就错继续，进行到映像文件复制到磁盘阶段，就是提示“检测已有Linux分区的文件系统失败”，没仔细看就点选择返回进行重新安装。</p>
+<p>这一次自然选择了自己分配磁盘空间，可是进入到分区列表时看到竟然有三个主分区，且前两个是ext分区，window系统在第三主分区，逻辑分分区中也有两个ext分区。但是怎么想也不知道为何出多出了两个ext主分区，因为映像中之前在装Ubuntu时只分了两个ext，一个用于挂载根目录“/”，一个用于挂在home。根据ext分区的大小能判断之前的Linux在哪个分区上，绝对没有在前两个ext主分区上，于是便选择删除两个ext主分区，把Linux挂在到逻辑分区上。但是在进入到复制文件的过程中，还是提示检测文件系统是失败，又重新进行了几次依然说检测系统文件失败。</p>
+<p>于是放弃了安装fedora，准备重启来修复MBR。由于之前的操作GRUB已经被破坏，重启之后就只有GRUB提示符。准备了Windows7的安装光盘，进入命令提示符使用bootrec /fixmbr和bootrec /fixboot两条命令完成修复，重启自然就进入了Windows的启动画面。</p>
+<p>可是问题现在就来了，启动画面没过多久后屏幕出现:</p>
+<p><pre class="lang:default decode:true ">autochk program not found – skipping autocheck</pre><br>&nbsp;</p>
+<p>接着便出现蓝屏，反复尝试仍然是这种情况。</p>
+<p>于是不断的Google，看到好多和我出现了同样的提示但能进入桌面，只有少数的是跟我一样会蓝屏。继续Google，看到一篇文章讲述了他修复Windows7启动的过程。于是我想到可能和作者的情况一样，应该是之前在安装Fedora分配分区时，本来一共有三个主分区。但我删除了前两个主分区，导致有系统文件的那个分区位置变化与盘符C错位，因此在系统启动时需要找到autochk文件来检测磁盘，但是盘符为C的磁盘错误，进而就找不到这个文件自然有</p>
+<p><pre class="lang:default decode:true ">autochk program not found – skipping autocheck</pre><br>&nbsp;</p>
+<p>文章中作者启动PE，使用osletter对盘符C和系统文件的分区做关联。这样操作之后重启果然成功启动 Windows7，由于本身我系统只有两个分区C和D盘，进入系统后果然发现D盘变成了光驱，原来的D分区不见了，通过磁盘管理器对原来的D分区重新分配盘符，OK一切搞定！<br>上述中所要使用的osletter命令需要下载osletter命令，然后用命令提示符进入到这个这个文件所在的文件夹中，接着使用</p>
+<p><pre class="lang:default decode:true ">osletter /targetletter:C /currentos:X</pre><br>&nbsp;</p>
+<p>命令进行做关联，其中c当然是系统分区所要使用指定的盘符，一般情况下都是C盘，而X就是你在PE中所能看到的你电脑硬盘中有系 统文件的分区的盘符。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2014/03/11/linuxwindows-e5-8f-8c-e7-b3-bb-e7-bb-9f-e9-87-8d-e8-a3-85linux-e4-b9-8b-e5-90-8e-e5-af-bc-e8-87-b4windows-e6-97-a0-e6-b3-95-e5-90-af-e5-8a-a8-e7-9a-84-e8-a7-a3-e5-86-b3-e5-8a-9e-e6-b3-95/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

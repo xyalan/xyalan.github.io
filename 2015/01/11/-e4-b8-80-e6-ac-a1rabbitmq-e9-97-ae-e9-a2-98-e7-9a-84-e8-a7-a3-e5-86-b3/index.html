@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>一次RabbitMQ问题的解决 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="公司使用的Java技术栈，MQ中间件是RabbitMQ，RabbitMQ的客户端使用的是Spring-AMQP。临近元旦几天却频繁宕机，影响到维护的一个老程序。经过排查发现可能是由于RabbitMQ 2.x版本的一个Bug，Queue超过一定的数量，两个节点复制Queue时候致使无法响应外界请求。Queue数量突然增多，其实是最近两个项目迁移合并导致。 整理一下所有的Queue，发现两个不同的Vh">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一次RabbitMQ问题的解决">
+<meta property="og:url" content="http://yoursite.com/2015/01/11/-e4-b8-80-e6-ac-a1rabbitmq-e9-97-ae-e9-a2-98-e7-9a-84-e8-a7-a3-e5-86-b3/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="公司使用的Java技术栈，MQ中间件是RabbitMQ，RabbitMQ的客户端使用的是Spring-AMQP。临近元旦几天却频繁宕机，影响到维护的一个老程序。经过排查发现可能是由于RabbitMQ 2.x版本的一个Bug，Queue超过一定的数量，两个节点复制Queue时候致使无法响应外界请求。Queue数量突然增多，其实是最近两个项目迁移合并导致。 整理一下所有的Queue，发现两个不同的Vh">
+<meta property="og:updated_time" content="2017-07-03T15:40:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一次RabbitMQ问题的解决">
+<meta name="twitter:description" content="公司使用的Java技术栈，MQ中间件是RabbitMQ，RabbitMQ的客户端使用的是Spring-AMQP。临近元旦几天却频繁宕机，影响到维护的一个老程序。经过排查发现可能是由于RabbitMQ 2.x版本的一个Bug，Queue超过一定的数量，两个节点复制Queue时候致使无法响应外界请求。Queue数量突然增多，其实是最近两个项目迁移合并导致。 整理一下所有的Queue，发现两个不同的Vh">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post--e4-b8-80-e6-ac-a1rabbitmq-e9-97-ae-e9-a2-98-e7-9a-84-e8-a7-a3-e5-86-b3" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">一次RabbitMQ问题的解决</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2015.01.11</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/其他/">其他</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2015/01/11/-e4-b8-80-e6-ac-a1rabbitmq-e9-97-ae-e9-a2-98-e7-9a-84-e8-a7-a3-e5-86-b3/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>公司使用的Java技术栈，MQ中间件是RabbitMQ，RabbitMQ的客户端使用的是Spring-AMQP。临近元旦几天却频繁宕机，影响到维护的一个老程序。经过排查发现可能是由于RabbitMQ 2.x版本的一个Bug，Queue超过一定的数量，两个节点复制Queue时候致使无法响应外界请求。Queue数量突然增多，其实是最近两个项目迁移合并导致。</p>
+<p>整理一下所有的Queue，发现两个不同的Vhost中存在相同Queue、Exchange、Binding，但其中有一个Vhost使用到。也就是说存在某种原因导致Queue在两个Vhost都创建了一次。查看我维护的那个项目发现两个不同的业务都各自使用自己Vhost，到底是什么原因导致其中一个Vhost中的队列再另一个中也创建了？</p>
+<p>查看Spring-AMQP的官方文档，跟踪它的源码，这个答案终于揭晓了。且看一步一步来分析。在<a href="http://docs.spring.io/spring-amqp/reference/html/amqp.html" target="_blank" rel="external">官方文档</a>中看到这么一段：</p>
+<blockquote>
+<p>By default, all queues, exchanges, and bindings are declared by all <code>RabbitAdmin</code> instances (that have <code>auto-startup=&quot;true&quot;</code>) in the application context.</p>
+</blockquote>
+<p>也就是说queues、exchanges、bindings都是通过RabbitAdmin来声明创建的。客户端的代码中配置MQ的地方确实有RabbitAdmin对象的实例化，但没发现任何地方去调用它。既然没地方使用，那么肯定又是Spring在管理。打开RabbitAdmin的源码，看到RabbitAdmin实现了接口InitializingBean。这个接口只有一个方法afterPropertiesSet()，实现了这个接口的类在初始化设置完熟悉之后会调用这个方法。RabbitAdmin实现了这个方法，方法的部分实现如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">connectionFactory.addConnectionListener(<span class="keyword">new</span> ConnectionListener() &#123;</div><div class="line"></div><div class="line">    <span class="comment">// Prevent stack overflow...</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> AtomicBoolean initializing = <span class="keyword">new</span> AtomicBoolean(<span class="keyword">false</span>);</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Connection connection)</span> </span>&#123;</div><div class="line">	<span class="keyword">if</span> (!initializing.compareAndSet(<span class="keyword">false</span>, <span class="keyword">true</span>)) &#123;</div><div class="line">	    <span class="comment">// If we are already initializing, we don't need to do it again...</span></div><div class="line">	    <span class="keyword">return</span>;</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">try</span> &#123;</div><div class="line">	    <span class="comment">/*</span></div><div class="line">	     * ...but it is possible for this to happen twice in the same ConnectionFactory (if more than</div><div class="line">	     * one concurrent Connection is allowed). It's idempotent, so no big deal (a bit of network</div><div class="line">	     * chatter). In fact it might even be a good thing: exclusive queues only make sense if they are</div><div class="line">	     * declared for every connection. If anyone has a problem with it: use auto-startup="false".</div><div class="line">	     */</div><div class="line">	    initialize();</div><div class="line">	&#125; <span class="keyword">finally</span> &#123;</div><div class="line">	    initializing.compareAndSet(<span class="keyword">true</span>, <span class="keyword">false</span>);</div><div class="line">	&#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClose</span><span class="params">(Connection connection)</span> </span>&#123;&#125;</div><div class="line"></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>这里添加一个Connection的监听，监听在Connection被创建的时候触发，并调用了initialize()方法。关于initialize()方法中有下面关键的几行代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">final</span> Collection&amp;lt;Exchange&amp;gt; exchanges = filterDeclarables(applicationContext.getBeansOfType(Exchange.class).values());</div><div class="line"><span class="keyword">final</span> Collection&amp;lt;Queue&amp;gt; queues = filterDeclarables(applicationContext.getBeansOfType(Queue.class).values());</div><div class="line"><span class="keyword">final</span> Collection&amp;lt;Binding&amp;gt; bindings = filterDeclarables(applicationContext.getBeansOfType(Binding.class).values());</div></pre></td></tr></table></figure>
+<p>监听在Connection第一次初始化的时候被触发，并执行了initialize()。在上面的代码中看到所有定义的Exchange、Queue、Binding对象由Spring来管理，这里使用getBeanOfType从Spring的applicationContext中获取对象。也就是说两个业务的客户端各自的RabbitAdmin在执行的时候都会拿到对方定义的Exchange、Queue、Binding，接下来filterDeclarables方法对这些对象做了过滤。看一看filterDeclarables方法的部分实现，就能解答需要探讨的问题了。代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (T declarable : declarables) &#123;</div><div class="line">	Collection&amp;lt;?&amp;gt; adminsWithWhichToDeclare = declarable.getDeclaringAdmins();</div><div class="line">	<span class="keyword">if</span> (declarable.shouldDeclare() &amp;amp;&amp;amp;</div><div class="line">		(adminsWithWhichToDeclare.isEmpty() || adminsWithWhichToDeclare.contains(<span class="keyword">this</span>))) &#123;</div><div class="line">		filtered.add(declarable);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如上所示，declarables就是上面从context中拿到的Exchange、Queue、Binding的对象集合。这里遍历集合，调用集合元素的getDeclaringAdmins方法获取RabbitAdmin的集合，getDeclaringAdmins是Declarable接口的一个方法，Queue、Exchange、Binding都实现了这个接口。并且它们各自都有一个方法叫setAdminsThatShouldDeclare，用于设置它们应该被托管的RabbitAdmin的集合。</p>
+<p>当getDeclaringAdmins拿到的RabbitAdmin集合为空或者包含当前正在执行的RabbitAdmin时都不会过滤掉。原因就在于我们的客户端代码当中都没有调用setAdminsThatShouldDeclare，执行到这里时获取到的RabbitAdmin集合为空，从applicationContext中拿到的所有Exchanges、Queues、Bindings在两个RabbitAdmin中都各自声明了一遍，于是也就有了两个Vhost有相同的Exchange、Queue、Binding。</p>
+<p>记下这个问题，也是因为它出现在元旦，整个元旦假期也因为此问题没有过好。虽然代码不是我写的，但让我感觉到写代码的人在使用Spring-Amqp的时候并没有认真的了解过，属于半生不熟的状态。当我们使用自己不熟悉的东西时，不应该马上拿起就用，而是应该先尽可能的先去了解一下要用的东西，要学会思考。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2015/01/11/-e4-b8-80-e6-ac-a1rabbitmq-e9-97-ae-e9-a2-98-e7-9a-84-e8-a7-a3-e5-86-b3/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

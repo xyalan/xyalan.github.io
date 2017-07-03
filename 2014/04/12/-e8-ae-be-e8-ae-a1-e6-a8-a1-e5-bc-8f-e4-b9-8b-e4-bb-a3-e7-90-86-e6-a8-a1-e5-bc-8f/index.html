@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>设计模式之代理模式 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="代理模式是设计模式中很重要的一个，看似平时好像很少应用到。如果理解了它，就会发现在开发当中，有很多地方是用代理模式可以很好的解决问题。并且很多现在的JAVA框架也用到了代理模式，最著名的莫过于Spring了。 首先，代理模式可分为静态代理和动态代理两种。代理的意义在于代理对象可以对被代理对象的行为发生之前或之后做一些其他的事情，这样可以让被代理对象专心的处理它的事情，对于其他的一些额外的行为可以交">
+<meta property="og:type" content="article">
+<meta property="og:title" content="设计模式之代理模式">
+<meta property="og:url" content="http://yoursite.com/2014/04/12/-e8-ae-be-e8-ae-a1-e6-a8-a1-e5-bc-8f-e4-b9-8b-e4-bb-a3-e7-90-86-e6-a8-a1-e5-bc-8f/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="代理模式是设计模式中很重要的一个，看似平时好像很少应用到。如果理解了它，就会发现在开发当中，有很多地方是用代理模式可以很好的解决问题。并且很多现在的JAVA框架也用到了代理模式，最著名的莫过于Spring了。 首先，代理模式可分为静态代理和动态代理两种。代理的意义在于代理对象可以对被代理对象的行为发生之前或之后做一些其他的事情，这样可以让被代理对象专心的处理它的事情，对于其他的一些额外的行为可以交">
+<meta property="og:updated_time" content="2017-07-03T15:40:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="设计模式之代理模式">
+<meta name="twitter:description" content="代理模式是设计模式中很重要的一个，看似平时好像很少应用到。如果理解了它，就会发现在开发当中，有很多地方是用代理模式可以很好的解决问题。并且很多现在的JAVA框架也用到了代理模式，最著名的莫过于Spring了。 首先，代理模式可分为静态代理和动态代理两种。代理的意义在于代理对象可以对被代理对象的行为发生之前或之后做一些其他的事情，这样可以让被代理对象专心的处理它的事情，对于其他的一些额外的行为可以交">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post--e8-ae-be-e8-ae-a1-e6-a8-a1-e5-bc-8f-e4-b9-8b-e4-bb-a3-e7-90-86-e6-a8-a1-e5-bc-8f" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">设计模式之代理模式</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2014.04.12</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/设计模式/">设计模式</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2014/04/12/-e8-ae-be-e8-ae-a1-e6-a8-a1-e5-bc-8f-e4-b9-8b-e4-bb-a3-e7-90-86-e6-a8-a1-e5-bc-8f/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>代理模式是设计模式中很重要的一个，看似平时好像很少应用到。如果理解了它，就会发现在开发当中，有很多地方是用代理模式可以很好的解决问题。并且很多现在的JAVA框架也用到了代理模式，最著名的莫过于Spring了。</p>
+<p>首先，代理模式可分为静态代理和动态代理两种。代理的意义在于代理对象可以对被代理对象的行为发生之前或之后做一些其他的事情，这样可以让被代理对象专心的处理它的事情，对于其他的一些额外的行为可以交给代理对象来处理。</p>
+<p>1.静态代理。比如我们生活中，如果你有房子要出租，你可以选择自己寻找租客，这样自己要处理很多问题，譬如说合同的拟订、房客资源的寻找、后期房屋的维护等等。还有一种则你可以委托中介来办，这样你只需要关心租房这个事情，其他找租客、拟订合同等等的事情都可以交给中介来办。生活中还有很多中的此类应用，比如产品的生产商委托代理商来销售产品等等，不一一举例了。</p>
+<p>很多情况下并不是只有一级代理，比如我现在的房子是从中介手中租下。原始房东租给二手房东（也可以说职业房东，他们租下很多房子），二手房东再扔给中介。这样做原始房东可以一次就签几年，省去了麻烦，而二手房东可以赚取差价。静态代理模式的实现有很多种，比如可以用继承的方式也可以用接口的方式等等。这里用接口的方式来举例我所租下房子的流程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">package com.hialan.proxy;</div><div class="line"></div><div class="line">/**</div><div class="line">* Created by Alan on 4/2/14.</div><div class="line">*/</div><div class="line">public interface ILandlord &#123;</div><div class="line">    public void rentHouse();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">package com.hialan.proxy;</div><div class="line"></div><div class="line">/**</div><div class="line">* Created by Alan on 4/2/14.</div><div class="line">*/</div><div class="line">public class Landlord implements ILandlord &#123;</div><div class="line">    @Override</div><div class="line">    public void rentHouse() &#123;</div><div class="line">        System.out.println(&quot;rent a house...&quot;);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">package com.hialan.proxy;</div><div class="line"></div><div class="line">/**</div><div class="line">* Created by Alan on 4/2/14.</div><div class="line">*/</div><div class="line">public class Proxy1 implements ILandlord &#123;</div><div class="line">    private ILandlord iLandlord;</div><div class="line"></div><div class="line">    public Proxy1(ILandlord iLandlord) &#123;</div><div class="line">        super();</div><div class="line">        this.iLandlord = iLandlord;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void rentHouse() &#123;</div><div class="line">        iLandlord.rentHouse();</div><div class="line">        // 隔成很多间、重新装修、维护等等</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">package com.hialan.proxy;</div><div class="line"></div><div class="line">/**</div><div class="line">* Created by Alan on 4/2/14.</div><div class="line">*/</div><div class="line">public class Proxy2 implements ILandlord &#123;</div><div class="line">    private ILandlord iLandlord;</div><div class="line"></div><div class="line">    public Proxy2(ILandlord iLandlord) &#123;</div><div class="line">        super();</div><div class="line">        this.iLandlord = iLandlord;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void rentHouse() &#123;</div><div class="line">        // 找房客资源、拟订合同</div><div class="line">        iLandlord.rentHouse();</div><div class="line">        // 监督</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">package com.hialan.proxy;</div><div class="line"></div><div class="line">/**</div><div class="line">* Created by Alan on 4/2/14.</div><div class="line">*/</div><div class="line">public class Test &#123;</div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        Landlord landlord = new Landlord();</div><div class="line">        Proxy1 proxy1 = new Proxy1(landlord);</div><div class="line">        Proxy2 proxy2 = new Proxy2(proxy1);</div><div class="line">        proxy2.rentHouse();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里Landlord就是原始房东，而Proxy1是二手房东，Proxy2是房产中介，Proxy1和Proxy2都是Landlord的代理。这个列子就是一个简单静态代理模式，还可以无限制一层一层代理下去。从这个例子当中，可以看到另一种JAVA的特点，就是多态的应用。</p>
+<p>2.动态代理。从上面的列子可以看到一个简单的动态代理模式，但是上述例子房东只有租房这件事情需要代理。但是如果房东有很多事情需要代理，这样就会产生很多个代理对象，在代码上就会产生很多个类，十分的不灵活。如果有一种方法可以根据需要代理的行为动态的产生代理对象，这样就会方便很多，这种代理模式就叫做动态代理模式。</p>
+<p>动态代理与静态代理的区别在于，现在这个代理对象不需要自己去手编写，而是根据需要代理的类型，动态的生成代理类，对于我们来说是看不见这个代理对象的，但是它多代理事情也发生了。</p>
+<p>动态代理从底层的实现上来讲，首先被代理对象实现了某个接口，有一个总代理。这个类的内部实现了根据你所传递的代理类型以及代理需要的处理对象动态生成了代理对象，也就是说这个类里可以动态生成一个代理类，我们不需要知道它的细节，它所生成的代理类完成了代理行为。注意，这里把代理的处理行为单独作为一直类型，需要自己去实现，调用只需要在生成代理对象时传进去即可。内部的实现可使用JDK6 Compiler API、CGlib、ASM编译代码或直接生成字节码。Spring里面就是使用了CGlib来产生代理类。</p>
+<p>Spring的AOP的实现就使用了动态代理模式，底层使用了CGlib来生成了代理对象，通过读取配置完成代理行为。比如事务，实际上就是先打开事务，然后代理完成被代理对象的行为，然后再根据结果提交或回滚事务。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2014/04/12/-e8-ae-be-e8-ae-a1-e6-a8-a1-e5-bc-8f-e4-b9-8b-e4-bb-a3-e7-90-86-e6-a8-a1-e5-bc-8f/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

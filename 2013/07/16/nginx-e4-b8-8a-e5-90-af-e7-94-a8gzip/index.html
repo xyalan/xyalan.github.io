@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>nginx上启用gzip | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="gzip是一个传输压缩的算法，启用gzip有两个好处： 1、进一步节省带宽；2、防止水平一般的爬虫抓页面偷数据。 我们公司使用nginx做http服务器，之前并未启用gzip模块。而gzip本身就是nginx自带的模块，所以只需要在nginx的配置文件中启用即可。 1.找到nginx的配置文件，我的在/usr/local/nginx/conf/nginx.conf,在其中添加： 12345678g">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nginx上启用gzip">
+<meta property="og:url" content="http://yoursite.com/2013/07/16/nginx-e4-b8-8a-e5-90-af-e7-94-a8gzip/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="gzip是一个传输压缩的算法，启用gzip有两个好处： 1、进一步节省带宽；2、防止水平一般的爬虫抓页面偷数据。 我们公司使用nginx做http服务器，之前并未启用gzip模块。而gzip本身就是nginx自带的模块，所以只需要在nginx的配置文件中启用即可。 1.找到nginx的配置文件，我的在/usr/local/nginx/conf/nginx.conf,在其中添加： 12345678g">
+<meta property="og:updated_time" content="2017-07-03T15:40:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="nginx上启用gzip">
+<meta name="twitter:description" content="gzip是一个传输压缩的算法，启用gzip有两个好处： 1、进一步节省带宽；2、防止水平一般的爬虫抓页面偷数据。 我们公司使用nginx做http服务器，之前并未启用gzip模块。而gzip本身就是nginx自带的模块，所以只需要在nginx的配置文件中启用即可。 1.找到nginx的配置文件，我的在/usr/local/nginx/conf/nginx.conf,在其中添加： 12345678g">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-nginx-e4-b8-8a-e5-90-af-e7-94-a8gzip" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">nginx上启用gzip</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2013.07.16</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/服务器/">服务器</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2013/07/16/nginx-e4-b8-8a-e5-90-af-e7-94-a8gzip/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>gzip是一个传输压缩的算法，启用gzip有两个好处：</p>
+<p>1、进一步节省带宽；<br>2、防止水平一般的爬虫抓页面偷数据。</p>
+<p>我们公司使用nginx做http服务器，之前并未启用gzip模块。而gzip本身就是nginx自带的模块，所以只需要在nginx的配置文件中启用即可。</p>
+<p>1.找到nginx的配置文件，我的在/usr/local/nginx/conf/nginx.conf,在其中添加：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">gzip on;  #表示启用</div><div class="line">gzip_buffers 4 16k; #设置gzip申请内存的大小,其作用是按块大小的倍数申请内存空间设置gzip申请内存的大小,其作用是按块大小的倍数申请内存空间</div><div class="line">gzip_min_length 1024;# 使用压缩的最小原文件</div><div class="line">gzip_proxied any;</div><div class="line">gzip_comp_level 4; # 压缩级别 1-9,默认是1，级别越高压缩率越大，当然压缩时间也就越长</div><div class="line">gzip_http_version 1.0;#默认1.1，1.0|1.1</div><div class="line">gzip_vary on; #和http头有关系，加个vary头，给代理服务器用的，有的浏览器支持压缩，有的不支持，所以避免浪费不支持的也压缩，所以根据客户端的HTTP头来判断，是否需要压缩</div><div class="line">gzip_types text/plain application/xml application/x-javascript text/javascript text/css; #压缩MIME类型</div></pre></td></tr></table></figure>
+<p>其中的gzip_http_version的设置，它的默认值是1.1，就是说对HTTP/1.1协议的请求才会进行gzip压缩<br>如果我们使用了proxy_pass进行反向代理，那么nginx和后端的upstream server之间是用HTTP/1.0协议通信的。</p>
+<p>另外还有一个参数叫做static_gzip，参数是on和off，但是使用它需要在编译的时候把static_gzip模块编译进去，使用参数./configure –with-http_gzip_static_module。此模块的作用就是在接到请求后，会到url相同的路径的文件系统去找扩展名为“.gz”的文件。比如：<a href="http://www.iteye.con/stylesheets/homepage.css，nginx就会先查找" target="_blank" rel="external">http://www.iteye.con/stylesheets/homepage.css，nginx就会先查找</a> stylesheets/homepage.css.gz 这个文件，如果存在直接把它发送出去；如果不存在，再将stylesheets/homepage.css文件进行gzip压缩，再发送出去，这样可以避免重复的压缩无谓的消耗资源。</p>
+<p>这个模块不受gzip_types限制，会对所有请求有效。所以建议不要在全局上使用，因为一般来说大部分都是动态请求，是不会有.gz这个文件的，建议只在局部我们确认有.gz的目录中使用。<br>Nginx不会自动的将压缩结果写入文件系统，这点不同于lighttpd，所以如果想使用static_gzip模块，需要自己写脚本生成.gz文件。<br>而对于Rails3项目来说就很方便了，只需要针对assets目录启用gzip_static模块即可：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">location ~ ^/(assets)/  &#123;</div><div class="line">    root /path/to/public;gzip_static on; # to serve pre-gzipped versionexpires max;</div><div class="line">    add_header Cache-Control public;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>2.找到nginx的master进程，重启它即可。关于重启nginx，可以显示杀死master进程，然后在使用/usr/local/nginx/sbin -c /usr/local/nginx/conf/nginx.conf启动即可。也可以使用ps的命令平滑重启nginx进程，命令是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kill -HUP 住进称号或进程号文件路径</div></pre></td></tr></table></figure>
+<p>它的意思是并不马上杀死进程，而是创建一新的进程，旧的进程仍然提供服务，然后新的进程会逐渐会代替新的进程提供服务。但是如果修改的配置文件有错，配置不会生效但也不会报错。所以在修改了配置文件之前，先确保配置文件正确。可以使用下列命令检查配置文件是否正确：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/usr/local/nginx/sbin/nginx -t -c /usr/nginx/conf/nginx.conf</div></pre></td></tr></table></figure>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2013/07/16/nginx-e4-b8-8a-e5-90-af-e7-94-a8gzip/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

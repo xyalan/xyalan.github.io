@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>由JAVA GC垃圾收集算法联想到应该避免的编码 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="如今现在大部分的商业JAVA虚拟机都是用的是分代收集算法，也就是说通过分为新生代和老年代分，根据其不同的特点使用不同的收集算法。目前新生代都采用的是复制算法来清理内存，因为其要copy对象到另一块儿内存，如果量大了自然也是不小的一个开销。 在编码当中应该尽量去减少GC copy的次数，而实际开发当中其实有很多情况是自己去可以去避免的。例如对于经常会说的String，对于它的“+”操作符就是我们应该">
+<meta property="og:type" content="article">
+<meta property="og:title" content="由JAVA GC垃圾收集算法联想到应该避免的编码">
+<meta property="og:url" content="http://yoursite.com/2014/04/04/-e7-94-b1java-gc-e5-9e-83-e5-9c-be-e6-94-b6-e9-9b-86-e7-ae-97-e6-b3-95-e8-81-94-e6-83-b3-e5-88-b0-e5-ba-94-e8-af-a5-e9-81-bf-e5-85-8d-e7-9a-84-e7-bc-96-e7-a0-81/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="如今现在大部分的商业JAVA虚拟机都是用的是分代收集算法，也就是说通过分为新生代和老年代分，根据其不同的特点使用不同的收集算法。目前新生代都采用的是复制算法来清理内存，因为其要copy对象到另一块儿内存，如果量大了自然也是不小的一个开销。 在编码当中应该尽量去减少GC copy的次数，而实际开发当中其实有很多情况是自己去可以去避免的。例如对于经常会说的String，对于它的“+”操作符就是我们应该">
+<meta property="og:updated_time" content="2017-07-03T15:40:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="由JAVA GC垃圾收集算法联想到应该避免的编码">
+<meta name="twitter:description" content="如今现在大部分的商业JAVA虚拟机都是用的是分代收集算法，也就是说通过分为新生代和老年代分，根据其不同的特点使用不同的收集算法。目前新生代都采用的是复制算法来清理内存，因为其要copy对象到另一块儿内存，如果量大了自然也是不小的一个开销。 在编码当中应该尽量去减少GC copy的次数，而实际开发当中其实有很多情况是自己去可以去避免的。例如对于经常会说的String，对于它的“+”操作符就是我们应该">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post--e7-94-b1java-gc-e5-9e-83-e5-9c-be-e6-94-b6-e9-9b-86-e7-ae-97-e6-b3-95-e8-81-94-e6-83-b3-e5-88-b0-e5-ba-94-e8-af-a5-e9-81-bf-e5-85-8d-e7-9a-84-e7-bc-96-e7-a0-81" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">由JAVA GC垃圾收集算法联想到应该避免的编码</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2014.04.04</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/Java基础/">Java基础</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2014/04/04/-e7-94-b1java-gc-e5-9e-83-e5-9c-be-e6-94-b6-e9-9b-86-e7-ae-97-e6-b3-95-e8-81-94-e6-83-b3-e5-88-b0-e5-ba-94-e8-af-a5-e9-81-bf-e5-85-8d-e7-9a-84-e7-bc-96-e7-a0-81/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>如今现在大部分的商业JAVA虚拟机都是用的是分代收集算法，也就是说通过分为新生代和老年代分，根据其不同的特点使用不同的收集算法。目前新生代都采用的是复制算法来清理内存，因为其要copy对象到另一块儿内存，如果量大了自然也是不小的一个开销。</p>
+<p>在编码当中应该尽量去减少GC copy的次数，而实际开发当中其实有很多情况是自己去可以去避免的。例如对于经常会说的String，对于它的“+”操作符就是我们应该去避免的。举两个例子：</p>
+<p>1.如下代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">String test = a + b;</div><div class="line"></div><div class="line">test += c;</div><div class="line"></div><div class="line">System.out.println(&quot;test=&quot; + test);</div></pre></td></tr></table></figure>
+<p>由于String是不可变的，因此对于它的“+”操作符，底层实质上是用StringBuilder实现的。因此对于这样一段简单的代码实际额外产生了5个短命的对象，虽然这个几个看起来影响不大，但如果代码中到处都充斥着这样的代码，那开销还是很大的。实际的隐式代码:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">StringBuilder sb = new StringBuilder(a);</div><div class="line"></div><div class="line">sb.append(b);</div><div class="line"></div><div class="line">String test = sb.toString;</div><div class="line"></div><div class="line">StringBuilder sbs = new StringBuilder(test);</div><div class="line"></div><div class="line">sbs.append(c);</div><div class="line"></div><div class="line">test = sbs.toString;</div><div class="line"></div><div class="line">System.out.println(new StringBuilder(&quot;test=&quot;).append(test).toString);</div></pre></td></tr></table></figure>
+<p>因此可以改成：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">StringBuilder sb = new StringBuilder(&quot;test=&quot;);</div><div class="line"></div><div class="line">String test= sb.append(a).append(b).append(c);</div><div class="line"></div><div class="line">System.out.println(test);</div></pre></td></tr></table></figure>
+<p>这样就减少了不必要的短命对象，也减轻GC的工作负担。</p>
+<p>2.对于ArrayList集合，在JAVA中用的还是比较多的。ArrayList在底层是用数组实现的，既然是数组它的长度就是固定的，它的扩展也是通过新建数组然后复制旧的数组到新的数组。</p>
+<p>并且ArrayList是有默认长度的，它的默认长度是10，超过10时它会新建一个新的数组，这个数组它也是固定长度的，所以再次当长度超过这个新的数组时它又会新建一个。如果在一个循环当中，那么可能第次已经新建了很多不必要的数组。</p>
+<p>因此就要尽量避免这种情况的发生，方法便是应该喂ArrayList分配一个初始的长度。在开发当中应该尽量去估算元素长度，初始化时为这个ArrayList分配这个长度。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">List&amp;lt;Object&amp;gt; arrayList = new ArrayList&amp;lt;Object&amp;gt;(len);</div></pre></td></tr></table></figure></p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2014/04/04/-e7-94-b1java-gc-e5-9e-83-e5-9c-be-e6-94-b6-e9-9b-86-e7-ae-97-e6-b3-95-e8-81-94-e6-83-b3-e5-88-b0-e5-ba-94-e8-af-a5-e9-81-bf-e5-85-8d-e7-9a-84-e7-bc-96-e7-a0-81/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

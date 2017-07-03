@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>对多cpu或多核cpu、线程、进程的思考 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="线程、进程应该是操作系统原理课上的知识，对于做程序开发应该有很好的理解，至少我是这么认为。 首先进程是计算机中已运行程序的实体，程序只是一个对指令、数据及其组织形式的描述，在计算中运行的实体是进程。程序对于线程可以是一个一对多的关系，很多个进程可以跟一个程序有关联，且每个进程皆可以同步（循序）或异步（平行）的方式独立运行。 线程是操作系统能够进行运算调度的最小单位，它是一个控制流，一个线程完成一个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="对多cpu或多核cpu、线程、进程的思考">
+<meta property="og:url" content="http://yoursite.com/2013/07/17/-e5-af-b9-e5-a4-9acpu-e6-88-96-e5-a4-9a-e6-a0-b8cpu-e3-80-81-e7-ba-bf-e7-a8-8b-e3-80-81-e8-bf-9b-e7-a8-8b-e7-9a-84-e6-80-9d-e8-80-83/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="线程、进程应该是操作系统原理课上的知识，对于做程序开发应该有很好的理解，至少我是这么认为。 首先进程是计算机中已运行程序的实体，程序只是一个对指令、数据及其组织形式的描述，在计算中运行的实体是进程。程序对于线程可以是一个一对多的关系，很多个进程可以跟一个程序有关联，且每个进程皆可以同步（循序）或异步（平行）的方式独立运行。 线程是操作系统能够进行运算调度的最小单位，它是一个控制流，一个线程完成一个">
+<meta property="og:updated_time" content="2017-07-03T15:40:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="对多cpu或多核cpu、线程、进程的思考">
+<meta name="twitter:description" content="线程、进程应该是操作系统原理课上的知识，对于做程序开发应该有很好的理解，至少我是这么认为。 首先进程是计算机中已运行程序的实体，程序只是一个对指令、数据及其组织形式的描述，在计算中运行的实体是进程。程序对于线程可以是一个一对多的关系，很多个进程可以跟一个程序有关联，且每个进程皆可以同步（循序）或异步（平行）的方式独立运行。 线程是操作系统能够进行运算调度的最小单位，它是一个控制流，一个线程完成一个">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post--e5-af-b9-e5-a4-9acpu-e6-88-96-e5-a4-9a-e6-a0-b8cpu-e3-80-81-e7-ba-bf-e7-a8-8b-e3-80-81-e8-bf-9b-e7-a8-8b-e7-9a-84-e6-80-9d-e8-80-83" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">对多cpu或多核cpu、线程、进程的思考</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2013.07.17</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/操作系统/">操作系统</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2013/07/17/-e5-af-b9-e5-a4-9acpu-e6-88-96-e5-a4-9a-e6-a0-b8cpu-e3-80-81-e7-ba-bf-e7-a8-8b-e3-80-81-e8-bf-9b-e7-a8-8b-e7-9a-84-e6-80-9d-e8-80-83/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>线程、进程应该是操作系统原理课上的知识，对于做程序开发应该有很好的理解，至少我是这么认为。</p>
+<p>首先进程是计算机中已运行程序的实体，程序只是一个对指令、数据及其组织形式的描述，在计算中运行的实体是进程。程序对于线程可以是一个一对多的关系，很多个进程可以跟一个程序有关联，且每个进程皆可以同步（循序）或异步（平行）的方式独立运行。</p>
+<p>线程是操作系统能够进行运算调度的最小单位，它是一个控制流，一个线程完成一个不同的任务。在现代的操作系统中，进程不是程序运行的基本单位，而是线程的一个容器。就如同在面向对象的设计语言中，类知识对一类对象的称呼，而对象或者实例才是这个类运行时的实力。一个对象可以创建多个示列。</p>
+<p>用形象一点的比喻，一个工厂，而一个工程会有很多个车间，每个车间又有许多的工人。在这里工厂就相当于是程序，而车间则是进程，每个工人则是线程。这样就可以理解到，进程之间所申请的资源、空间都是独立的，和其进程是不共享的。而由于一个车间里有很多的工人，也就是说在这一个进程中的所有线程都是共享所有资源的。车间里每个人是完成同一项生产的不同任务，这就很好的理解了线程的作用。虽然车间里的资源对于所有工人都是共享的，但是每一个资源并不能同时提供给同一人使用。相对的，线程也是这样的，这也就形象的说明了关于线程安全的问题。</p>
+<p>现在说说和cpu的关系。现在的电脑基本都是多核的，还有多cpu的，无论是多核cpu还是多cpu都是指有多个cpu。要扯上cpu，那就要明白一点，在现在的操作系统中，调度的基本单位是线程，和进程没有关系。所以才谈于cpu的关系时，只看线程的个数。在以前的单cpu中，多线程的执行都是靠时间的轮转执行的，如今有了多cpu，那可以两个cpu可以同时执行两个线程。</p>
+<p>这是目前对进程、线程、cpu的认识。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2013/07/17/-e5-af-b9-e5-a4-9acpu-e6-88-96-e5-a4-9a-e6-a0-b8cpu-e3-80-81-e7-ba-bf-e7-a8-8b-e3-80-81-e8-bf-9b-e7-a8-8b-e7-9a-84-e6-80-9d-e8-80-83/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

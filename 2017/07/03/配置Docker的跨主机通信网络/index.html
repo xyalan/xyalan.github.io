@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>配置Docker的跨主机通信网络 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="配置Docker的跨主机通信网络Docker网络模式众所周知docker有3种网络模式，分别是bridge 、host、none。默认的是bridge，即在主机上创建一个虚拟网桥(交换机)，用ifconfig主机上一般都能看到这个叫docker0。容器会分配到一个IP，数据包通过转发到docker0，在同一主机下的容器通过这种方式可以直接通信。若是跨主机则需要通过映射主机端口的方式，确实一定的扩展">
+<meta property="og:type" content="article">
+<meta property="og:title" content="配置Docker的跨主机通信网络">
+<meta property="og:url" content="http://yoursite.com/2017/07/03/配置Docker的跨主机通信网络/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="配置Docker的跨主机通信网络Docker网络模式众所周知docker有3种网络模式，分别是bridge 、host、none。默认的是bridge，即在主机上创建一个虚拟网桥(交换机)，用ifconfig主机上一般都能看到这个叫docker0。容器会分配到一个IP，数据包通过转发到docker0，在同一主机下的容器通过这种方式可以直接通信。若是跨主机则需要通过映射主机端口的方式，确实一定的扩展">
+<meta property="og:updated_time" content="2017-07-03T15:46:04.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="配置Docker的跨主机通信网络">
+<meta name="twitter:description" content="配置Docker的跨主机通信网络Docker网络模式众所周知docker有3种网络模式，分别是bridge 、host、none。默认的是bridge，即在主机上创建一个虚拟网桥(交换机)，用ifconfig主机上一般都能看到这个叫docker0。容器会分配到一个IP，数据包通过转发到docker0，在同一主机下的容器通过这种方式可以直接通信。若是跨主机则需要通过映射主机端口的方式，确实一定的扩展">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#配置Docker的跨主机通信网络"><span class="toc-text">配置Docker的跨主机通信网络</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Docker网络模式"><span class="toc-text">Docker网络模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#跨主机通信"><span class="toc-text">跨主机通信</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#前提"><span class="toc-text">前提</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装Etcd"><span class="toc-text">安装Etcd</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#配置docker-Engine-daemon"><span class="toc-text">配置docker Engine daemon</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#创建overlay网络"><span class="toc-text">创建overlay网络</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#在overlay网络下运行容器"><span class="toc-text">在overlay网络下运行容器</span></a></li></ol></li></ol></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-配置Docker的跨主机通信网络" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">配置Docker的跨主机通信网络</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2017.07.03</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2017/07/03/配置Docker的跨主机通信网络/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h1 id="配置Docker的跨主机通信网络"><a href="#配置Docker的跨主机通信网络" class="headerlink" title="配置Docker的跨主机通信网络"></a>配置Docker的跨主机通信网络</h1><h2 id="Docker网络模式"><a href="#Docker网络模式" class="headerlink" title="Docker网络模式"></a>Docker网络模式</h2><p>众所周知docker有3种网络模式，分别是<code>bridge</code> 、<code>host</code>、<code>none</code>。默认的是<code>bridge</code>，即在主机上创建一个虚拟网桥(交换机)，用<code>ifconfig</code>主机上一般都能看到这个叫<code>docker0</code>。容器会分配到一个IP，数据包通过转发到<code>docker0</code>，在同一主机下的容器通过这种方式可以直接通信。若是跨主机则需要通过映射主机端口的方式，确实一定的扩展性。</p>
+<p><code>host</code>则是容器和主机共享网络配置，<code>none</code>是容器不会有任何网络配置，需要自己手动配置。</p>
+<h2 id="跨主机通信"><a href="#跨主机通信" class="headerlink" title="跨主机通信"></a>跨主机通信</h2><p>docker开始并没有关注网络方面，由于需求有很多第三方的解决方案，包括<code>Libnetwork</code>、<code>Flannel</code>等。之前公司在做marathon集群的网络解决方案是是通过<code>calico</code>实现，但是太过于复杂后来放弃。docker1.9之后终于出官方的方案<code>overlay</code>。使用<code>overlay</code>必须要借助于KV存储系统，官方支持<code>Consul</code>, <code>etcd</code>, <code>ZooKeeper</code>和本地KV存储系统<code>BoltDB</code>。官方给的示列是基于<code>Swarm</code>和<code>Consul</code>。因为之前通过<code>etcd</code>做服务发现和配置中心，本文将基于<code>etcd</code>在没有<code>Swarm</code>情况下配置<code>overlay</code>。</p>
+<h3 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h3><ol>
+<li>一个KV存储系统<code>etcd</code>，并且能被整个集群的各节点访问到；</li>
+<li>每个主机都需要可配置docker Engine <code>daemon</code>；</li>
+<li>主机必须是3.16及以上内核的Linux；</li>
+<li>主机必须有有一些端口可以被使用，包括KV存储系统的，docker监听的远程客户端端口等；</li>
+</ol>
+<h3 id="安装Etcd"><a href="#安装Etcd" class="headerlink" title="安装Etcd"></a>安装Etcd</h3><p>由于是测试，只安装一个单实例的etcd。从github下载已经编译过的二进制包并解压：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">wget https://github.com/coreos/etcd/releases/download/v3.2.1/etcd-v3.2.1-linux-arm64.tar.gz &amp;&amp; tar -xvf etcd-v3.2.1-linux-arm64.tar.gz</div></pre></td></tr></table></figure>
+<p>运行etcd：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cd etcd-v3.2.1-linux-arm64</div><div class="line">nohup ./etcd &gt; etcd.log 2&gt;&amp;1 &amp;</div></pre></td></tr></table></figure>
+<h3 id="配置docker-Engine-daemon"><a href="#配置docker-Engine-daemon" class="headerlink" title="配置docker Engine daemon"></a>配置docker Engine daemon</h3><p>在比较老的docker下，配置文件可能在<code>/etc/default/docker</code>，编辑并添加如下参数：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">DOCKER_OPTS="-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --cluster-store=etcd://127.0.0.1:2379/network --cluster-advertise=ens160:2375"</div></pre></td></tr></table></figure>
+<p>其中前两个<code>-H</code>参数是docker需要监听的远程客户端，<code>--cluster-store</code>就是KV存储系统的访问地址，<code>--cluster-advertise</code>是docker所监听Linux上的网络接口和端口号。</p>
+<p>现在从docker文档安装的最新版的docker 17.06.0-ce，就是那个已经改名过后的docker。配置文件在<code>/etc/docker/daemon.json</code>，添加如下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">        <span class="attr">"registry-mirrors"</span>: [<span class="string">"http://a0596535.m.daocloud.io"</span>],</div><div class="line">        <span class="attr">"hosts"</span>: [<span class="string">"tcp://0.0.0.0:2375"</span>, <span class="string">"unix:///var/run/docker.sock"</span>],</div><div class="line">        <span class="attr">"cluster-store"</span>: <span class="string">"etcd://127.0.0.1:2379"</span>,</div><div class="line">        <span class="attr">"cluster-advertise"</span>: <span class="string">"ens160:2375"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>配置好docker之后重启daemon：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">systemctl restart docker</div></pre></td></tr></table></figure>
+<h3 id="创建overlay网络"><a href="#创建overlay网络" class="headerlink" title="创建overlay网络"></a>创建overlay网络</h3><p>先看看当前默认的网络：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span>  docker network ls</div><div class="line">NETWORK ID          NAME                DRIVER              SCOPE</div><div class="line">6d7af496fd0f        bridge              bridge              local</div><div class="line">e136d9020834        host                host                local</div><div class="line">1afff9cac664        none                null                local</div></pre></td></tr></table></figure>
+<p>可以看到这就是上面说到的docker的几个网络模式，确保刚刚docker daemon配置完成并且重启成功，创建网络：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker network create -d overlay --subnet=10.10.10.0/24 multi-host</div></pre></td></tr></table></figure>
+<p>其中<code>-d</code>参数指定了这次要创建的网络驱动，<code>--subnet</code>指定了要创建的这个子网，<code>multi-host</code>后面就是这个创建的网络的名称。现在查看当前的网络：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span>  docker network ls</div><div class="line">NETWORK ID          NAME                DRIVER              SCOPE</div><div class="line">6d7af496fd0f        bridge              bridge              local</div><div class="line">e136d9020834        host                host                local</div><div class="line">c4940941351f        multi-host          overlay             global</div><div class="line">1afff9cac664        none                null                local</div></pre></td></tr></table></figure>
+<p>可以看到<code>multi-host</code>已经创建成功。</p>
+<h3 id="在overlay网络下运行容器"><a href="#在overlay网络下运行容器" class="headerlink" title="在overlay网络下运行容器"></a>在overlay网络下运行容器</h3><p>使用<code>busybox</code>容器来测试，分别创建两个容器：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> docker run -itd --name c1 --net multi-host  busybox</div><div class="line">f5d8ed1ba5a0d7226ca87536918a5e39741a353688f45e5ed2b0d34f590ab010</div><div class="line"><span class="meta">#</span> docker run -itd --name c2 --net multi-host  busybox</div><div class="line">9cd34b0154c31f47f4c74617fe17f72c41fb6d0f909c0a2bbcbe9921ac5e6e2c</div></pre></td></tr></table></figure>
+<p><code>--net</code>参数即是指定刚刚创建的网络，现在检查<code>multi-host</code>网络：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> docker network inspect multi-host</div><div class="line">[</div><div class="line">    &#123;</div><div class="line">        "Name": "multi-host",</div><div class="line">        "Id": "c4940941351ffcbb27f1e10641931d51baf50c30fb92d3daa71fe578a20600ac",</div><div class="line">        "Created": "2017-06-30T10:19:51.145669408+08:00",</div><div class="line">        "Scope": "global",</div><div class="line">        "Driver": "overlay",</div><div class="line">        "EnableIPv6": false,</div><div class="line">        "IPAM": &#123;</div><div class="line">            "Driver": "default",</div><div class="line">            "Options": &#123;&#125;,</div><div class="line">            "Config": [</div><div class="line">                &#123;</div><div class="line">                    "Subnet": "10.10.10.0/24"</div><div class="line">                &#125;</div><div class="line">            ]</div><div class="line">        &#125;,</div><div class="line">        "Internal": false,</div><div class="line">        "Attachable": false,</div><div class="line">        "Ingress": false,</div><div class="line">        "ConfigFrom": &#123;</div><div class="line">            "Network": ""</div><div class="line">        &#125;,</div><div class="line">        "ConfigOnly": false,</div><div class="line">        "Containers": &#123;</div><div class="line">            "9cd34b0154c31f47f4c74617fe17f72c41fb6d0f909c0a2bbcbe9921ac5e6e2c": &#123;</div><div class="line">                "Name": "c2",</div><div class="line">                "EndpointID": "16c6f2cd9f65d3a8297770bbe0aab95ba7543d024924ef3fe9f4ecfd2c280190",</div><div class="line">                "MacAddress": "02:42:0a:0a:0a:03",</div><div class="line">                "IPv4Address": "10.10.10.3/24",</div><div class="line">                "IPv6Address": ""</div><div class="line">            &#125;,</div><div class="line">            "f5d8ed1ba5a0d7226ca87536918a5e39741a353688f45e5ed2b0d34f590ab010": &#123;</div><div class="line">                "Name": "c1",</div><div class="line">                "EndpointID": "879130bb02fca09463242e0ace5c8714b20484fcdad2de69b66228c378fd9d81",</div><div class="line">                "MacAddress": "02:42:0a:0a:0a:02",</div><div class="line">                "IPv4Address": "10.10.10.2/24",</div><div class="line">                "IPv6Address": ""</div><div class="line">            &#125;</div><div class="line">        &#125;,</div><div class="line">        "Options": &#123;&#125;,</div><div class="line">        "Labels": &#123;&#125;</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
+<p>可以看到Containers下两个容器分配的IP都在刚刚创建的<code>multi-host</code>网络：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> docker network inspect multi-host</div><div class="line">[</div><div class="line">    &#123;</div><div class="line">        "Name": "multi-host",</div><div class="line">        "Id": "c4940941351ffcbb27f1e10641931d51baf50c30fb92d3daa71fe578a20600ac",</div><div class="line">        "Created": "2017-06-30T10:19:51.145669408+08:00",</div><div class="line">        "Scope": "global",</div><div class="line">        "Driver": "overlay",</div><div class="line">        "EnableIPv6": false,</div><div class="line">        "IPAM": &#123;</div><div class="line">            "Driver": "default",</div><div class="line">            "Options": &#123;&#125;,</div><div class="line">            "Config": [</div><div class="line">                &#123;</div><div class="line">                    "Subnet": "10.10.10.0/24"</div><div class="line">                &#125;</div><div class="line">            ]</div><div class="line">        &#125;,</div><div class="line">        "Internal": false,</div><div class="line">        "Attachable": false,</div><div class="line">        "Ingress": false,</div><div class="line">        "ConfigFrom": &#123;</div><div class="line">            "Network": ""</div><div class="line">        &#125;,</div><div class="line">        "ConfigOnly": false,</div><div class="line">        "Containers": &#123;</div><div class="line">            "9cd34b0154c31f47f4c74617fe17f72c41fb6d0f909c0a2bbcbe9921ac5e6e2c": &#123;</div><div class="line">                "Name": "c2",</div><div class="line">                "EndpointID": "16c6f2cd9f65d3a8297770bbe0aab95ba7543d024924ef3fe9f4ecfd2c280190",</div><div class="line">                "MacAddress": "02:42:0a:0a:0a:03",</div><div class="line">                "IPv4Address": "10.10.10.3/24",</div><div class="line">                "IPv6Address": ""</div><div class="line">            &#125;,</div><div class="line">            "f5d8ed1ba5a0d7226ca87536918a5e39741a353688f45e5ed2b0d34f590ab010": &#123;</div><div class="line">                "Name": "c1",</div><div class="line">                "EndpointID": "879130bb02fca09463242e0ace5c8714b20484fcdad2de69b66228c378fd9d81",</div><div class="line">                "MacAddress": "02:42:0a:0a:0a:02",</div><div class="line">                "IPv4Address": "10.10.10.2/24",</div><div class="line">                "IPv6Address": ""</div><div class="line">            &#125;</div><div class="line">        &#125;,</div><div class="line">        "Options": &#123;&#125;,</div><div class="line">        "Labels": &#123;&#125;</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
+<p>可以看到Containers下两个容器分配的IP都在刚刚创建的<code>multi-host</code>网络：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> docker network inspect multi-host</div><div class="line">[</div><div class="line">    &#123;</div><div class="line">        "Name": "multi-host",</div><div class="line">        "Id": "c4940941351ffcbb27f1e10641931d51baf50c30fb92d3daa71fe578a20600ac",</div><div class="line">        "Created": "2017-06-30T10:19:51.145669408+08:00",</div><div class="line">        "Scope": "global",</div><div class="line">        "Driver": "overlay",</div><div class="line">        "EnableIPv6": false,</div><div class="line">        "IPAM": &#123;</div><div class="line">            "Driver": "default",</div><div class="line">            "Options": &#123;&#125;,</div><div class="line">            "Config": [</div><div class="line">                &#123;</div><div class="line">                    "Subnet": "10.10.10.0/24"</div><div class="line">                &#125;</div><div class="line">            ]</div><div class="line">        &#125;,</div><div class="line">        "Internal": false,</div><div class="line">        "Attachable": false,</div><div class="line">        "Ingress": false,</div><div class="line">        "ConfigFrom": &#123;</div><div class="line">            "Network": ""</div><div class="line">        &#125;,</div><div class="line">        "ConfigOnly": false,</div><div class="line">        "Containers": &#123;</div><div class="line">            "9cd34b0154c31f47f4c74617fe17f72c41fb6d0f909c0a2bbcbe9921ac5e6e2c": &#123;</div><div class="line">                "Name": "c2",</div><div class="line">                "EndpointID": "16c6f2cd9f65d3a8297770bbe0aab95ba7543d024924ef3fe9f4ecfd2c280190",</div><div class="line">                "MacAddress": "02:42:0a:0a:0a:03",</div><div class="line">                "IPv4Address": "10.10.10.3/24",</div><div class="line">                "IPv6Address": ""</div><div class="line">            &#125;,</div><div class="line">            "f5d8ed1ba5a0d7226ca87536918a5e39741a353688f45e5ed2b0d34f590ab010": &#123;</div><div class="line">                "Name": "c1",</div><div class="line">                "EndpointID": "879130bb02fca09463242e0ace5c8714b20484fcdad2de69b66228c378fd9d81",</div><div class="line">                "MacAddress": "02:42:0a:0a:0a:02",</div><div class="line">                "IPv4Address": "10.10.10.2/24",</div><div class="line">                "IPv6Address": ""</div><div class="line">            &#125;</div><div class="line">        &#125;,</div><div class="line">        "Options": &#123;&#125;,</div><div class="line">        "Labels": &#123;&#125;</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
+<p>可以看到Containers下两个容器分配的IP都在刚刚创建的<code>multi-host</code>网络：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> docker network inspect multi-host</div><div class="line">[</div><div class="line">    &#123;</div><div class="line">        "Name": "multi-host",</div><div class="line">        "Id": "c4940941351ffcbb27f1e10641931d51baf50c30fb92d3daa71fe578a20600ac",</div><div class="line">        "Created": "2017-06-30T10:19:51.145669408+08:00",</div><div class="line">        "Scope": "global",</div><div class="line">        "Driver": "overlay",</div><div class="line">        "EnableIPv6": false,</div><div class="line">        "IPAM": &#123;</div><div class="line">            "Driver": "default",</div><div class="line">            "Options": &#123;&#125;,</div><div class="line">            "Config": [</div><div class="line">                &#123;</div><div class="line">                    "Subnet": "10.10.10.0/24"</div><div class="line">                &#125;</div><div class="line">            ]</div><div class="line">        &#125;,</div><div class="line">        "Internal": false,</div><div class="line">        "Attachable": false,</div><div class="line">        "Ingress": false,</div><div class="line">        "ConfigFrom": &#123;</div><div class="line">            "Network": ""</div><div class="line">        &#125;,</div><div class="line">        "ConfigOnly": false,</div><div class="line">        "Containers": &#123;</div><div class="line">            "9cd34b0154c31f47f4c74617fe17f72c41fb6d0f909c0a2bbcbe9921ac5e6e2c": &#123;</div><div class="line">                "Name": "c2",</div><div class="line">                "EndpointID": "16c6f2cd9f65d3a8297770bbe0aab95ba7543d024924ef3fe9f4ecfd2c280190",</div><div class="line">                "MacAddress": "02:42:0a:0a:0a:03",</div><div class="line">                "IPv4Address": "10.10.10.3/24",</div><div class="line">                "IPv6Address": ""</div><div class="line">            &#125;,</div><div class="line">            "f5d8ed1ba5a0d7226ca87536918a5e39741a353688f45e5ed2b0d34f590ab010": &#123;</div><div class="line">                "Name": "c1",</div><div class="line">                "EndpointID": "879130bb02fca09463242e0ace5c8714b20484fcdad2de69b66228c378fd9d81",</div><div class="line">                "MacAddress": "02:42:0a:0a:0a:02",</div><div class="line">                "IPv4Address": "10.10.10.2/24",</div><div class="line">                "IPv6Address": ""</div><div class="line">            &#125;</div><div class="line">        &#125;,</div><div class="line">        "Options": &#123;&#125;,</div><div class="line">        "Labels": &#123;&#125;</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
+<p>可以看到Containers下两个容器分配的IP都在刚刚创建的<code>multi-host</code>网络：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> docker network inspect multi-host</div><div class="line">[</div><div class="line">    &#123;</div><div class="line">        "Name": "multi-host",</div><div class="line">        "Id": "c4940941351ffcbb27f1e10641931d51baf50c30fb92d3daa71fe578a20600ac",</div><div class="line">        "Created": "2017-06-30T10:19:51.145669408+08:00",</div><div class="line">        "Scope": "global",</div><div class="line">        "Driver": "overlay",</div><div class="line">        "EnableIPv6": false,</div><div class="line">        "IPAM": &#123;</div><div class="line">            "Driver": "default",</div><div class="line">            "Options": &#123;&#125;,</div><div class="line">            "Config": [</div><div class="line">                &#123;</div><div class="line">                    "Subnet": "10.10.10.0/24"</div><div class="line">                &#125;</div><div class="line">            ]</div><div class="line">        &#125;,</div><div class="line">        "Internal": false,</div><div class="line">        "Attachable": false,</div><div class="line">        "Ingress": false,</div><div class="line">        "ConfigFrom": &#123;</div><div class="line">            "Network": ""</div><div class="line">        &#125;,</div><div class="line">        "ConfigOnly": false,</div><div class="line">        "Containers": &#123;</div><div class="line">            "9cd34b0154c31f47f4c74617fe17f72c41fb6d0f909c0a2bbcbe9921ac5e6e2c": &#123;</div><div class="line">                "Name": "c2",</div><div class="line">                "EndpointID": "16c6f2cd9f65d3a8297770bbe0aab95ba7543d024924ef3fe9f4ecfd2c280190",</div><div class="line">                "MacAddress": "02:42:0a:0a:0a:03",</div><div class="line">                "IPv4Address": "10.10.10.3/24",</div><div class="line">                "IPv6Address": ""</div><div class="line">            &#125;,</div><div class="line">            "f5d8ed1ba5a0d7226ca87536918a5e39741a353688f45e5ed2b0d34f590ab010": &#123;</div><div class="line">                "Name": "c1",</div><div class="line">                "EndpointID": "879130bb02fca09463242e0ace5c8714b20484fcdad2de69b66228c378fd9d81",</div><div class="line">                "MacAddress": "02:42:0a:0a:0a:02",</div><div class="line">                "IPv4Address": "10.10.10.2/24",</div><div class="line">                "IPv6Address": ""</div><div class="line">            &#125;</div><div class="line">        &#125;,</div><div class="line">        "Options": &#123;&#125;,</div><div class="line">        "Labels": &#123;&#125;</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
+<p>可以看到Containers下两个容器分配的IP都在刚刚创建的<code>multi-host</code>网络下。查看容器里面的网络配置，可以看到网络接口eth0的IP：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">#docker exec c1 ifconfig</div><div class="line">eth0      Link encap:Ethernet  HWaddr 02:42:0A:0A:0A:02</div><div class="line">          inet addr:10.10.10.2  Bcast:0.0.0.0  Mask:255.255.255.0</div><div class="line">          UP BROADCAST RUNNING MULTICAST  MTU:1450  Metric:1</div><div class="line">          RX packets:0 errors:0 dropped:0 overruns:0 frame:0</div><div class="line">          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0</div><div class="line">          collisions:0 txqueuelen:0</div><div class="line">          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)</div><div class="line"></div><div class="line">eth1      Link encap:Ethernet  HWaddr 02:42:AC:12:00:02</div><div class="line">          inet addr:172.18.0.2  Bcast:0.0.0.0  Mask:255.255.0.0</div><div class="line">          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1</div><div class="line">          RX packets:8 errors:0 dropped:0 overruns:0 frame:0</div><div class="line">          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0</div><div class="line">          collisions:0 txqueuelen:0</div><div class="line">          RX bytes:648 (648.0 B)  TX bytes:0 (0.0 B)</div><div class="line"></div><div class="line">lo        Link encap:Local Loopback</div><div class="line">          inet addr:127.0.0.1  Mask:255.0.0.0</div><div class="line">          UP LOOPBACK RUNNING  MTU:65536  Metric:1</div><div class="line">          RX packets:0 errors:0 dropped:0 overruns:0 frame:0</div><div class="line">          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0</div><div class="line">          collisions:0 txqueuelen:1</div><div class="line">          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)</div></pre></td></tr></table></figure>
+<p>现在直接ping c2容器，可以直接ping容器名，可以看到能正常通信：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker exec c1 ping -w 3 c2</div></pre></td></tr></table></figure>
+<p>这样一个<code>overlay</code>已经配置成功，还可以配置多个<code>overlay</code>网络，下次在研究。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2017/07/03/配置Docker的跨主机通信网络/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>为Emacst添加scala支持 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="最近公司要重新开发一个项目，并且使用Scala开发。虽然很早之前就开始学习Scala，但也并不是很熟悉。为了熟练Emacs便想为它添加Scala，Google一下很容易得到结果，但也要记录一下过程。 scala-mode可以从这里得到，支持emacs23及最新的；scala-mode2可以从这里得到，支持emacs24及最新的。推荐使用的是scala-mode2，它已经存在于MELPA中，而且em">
+<meta property="og:type" content="article">
+<meta property="og:title" content="为Emacst添加scala支持">
+<meta property="og:url" content="http://yoursite.com/2014/08/12/-e4-b8-baemacst-e6-b7-bb-e5-8a-a0scala-e6-94-af-e6-8c-81/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="最近公司要重新开发一个项目，并且使用Scala开发。虽然很早之前就开始学习Scala，但也并不是很熟悉。为了熟练Emacs便想为它添加Scala，Google一下很容易得到结果，但也要记录一下过程。 scala-mode可以从这里得到，支持emacs23及最新的；scala-mode2可以从这里得到，支持emacs24及最新的。推荐使用的是scala-mode2，它已经存在于MELPA中，而且em">
+<meta property="og:updated_time" content="2017-07-03T15:40:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="为Emacst添加scala支持">
+<meta name="twitter:description" content="最近公司要重新开发一个项目，并且使用Scala开发。虽然很早之前就开始学习Scala，但也并不是很熟悉。为了熟练Emacs便想为它添加Scala，Google一下很容易得到结果，但也要记录一下过程。 scala-mode可以从这里得到，支持emacs23及最新的；scala-mode2可以从这里得到，支持emacs24及最新的。推荐使用的是scala-mode2，它已经存在于MELPA中，而且em">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post--e4-b8-baemacst-e6-b7-bb-e5-8a-a0scala-e6-94-af-e6-8c-81" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">为Emacst添加scala支持</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2014.08.12</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/其他/">其他</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2014/08/12/-e4-b8-baemacst-e6-b7-bb-e5-8a-a0scala-e6-94-af-e6-8c-81/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>最近公司要重新开发一个项目，并且使用Scala开发。虽然很早之前就开始学习Scala，但也并不是很熟悉。为了熟练Emacs便想为它添加Scala，Google一下很容易得到结果，但也要记录一下过程。</p>
+<p>scala-mode可以从<a href="https://github.com/scala/scala-dist/tree/master/tool-support/src/emacs" target="_blank" rel="external">这里</a>得到，支持emacs23及最新的；scala-mode2可以从<a href="https://github.com/hvesalai/scala-mode2" target="_blank" rel="external">这里</a>得到，支持emacs24及最新的。推荐使用的是scala-mode2，它已经存在于MELPA中，而且emacs24自带包管理(MELPA)因此安装比较方便。</p>
+<p>有两种配置方式：</p>
+<ul>
+<li>由于emacs24自带包管理，所以如果emacs24那可以用这种配置方式。这种方式的好处是安装简便，并且可以自动更新，管理也更加容易。直接在emacs的启动文件中添加：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">(require &apos;package)</div><div class="line">(add-to-list &apos;package-archives</div><div class="line">             &apos;(&quot;melpa&quot; . &quot;http://melpa.milkbox.net/packages/&quot;) t)</div><div class="line">(package-initialize)</div><div class="line">(unless (package-installed-p &apos;scala-mode2)</div><div class="line">  (package-refresh-contents) (package-install &apos;scala-mode2))</div></pre></td></tr></table></figure>
+<p>使用C-x C-e执行buffer，便会自动安装配置。或者可以选择自定义安装，首先添加包的仓库：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">M-x customize-variable [RET] package-archives</div></pre></td></tr></table></figure>
+<p>并且添加MELPA，通常情况下是已经存在的，RET是执行回车的意思。然后使用上面添加的包安装：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">M-x package-install [RET] scala-mode2 [RET]</div></pre></td></tr></table></figure>
+<p>重启后打开一个scala文件，如果没有问题正常应该是已经包含scala的支持。</p>
+<ul>
+<li>还有就是传统的手动安装，从上面提供的mode地址下载scala-mode。添加下面代码到启动文件中，并且注意路径指向scala-mode的目录：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">(add-to-list &apos;load-path &quot;/path/to/scala-mode2/&quot;)</div><div class="line">(require &apos;scala-mode2)</div></pre></td></tr></table></figure>
+<p>同样重启后应该正常情况下已经支持。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2014/08/12/-e4-b8-baemacst-e6-b7-bb-e5-8a-a0scala-e6-94-af-e6-8c-81/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

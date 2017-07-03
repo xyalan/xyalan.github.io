@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>关于OS X的环境变量 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="对于Windows的环境变量，由于Windows系统是用的时间长，对其环境变量的配置也算比较了解。Windows的环境变量也分系统级别和用户级别的，并且是可视化的操作，因此也相对简单很多。 而在Linux、OS X这些系统来说，环境变量的配置都是直接操作文件，以前在使用Linux的时候，总有一种印象觉着比较麻烦，所以也一直都不怎么去详细了解。最近配置自己电脑OS X的环境变量，做了一些详细的了解，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于OS X的环境变量">
+<meta property="og:url" content="http://yoursite.com/2014/04/01/-e5-85-b3-e4-ba-8eos-x-e7-9a-84-e7-8e-af-e5-a2-83-e5-8f-98-e9-87-8f/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="对于Windows的环境变量，由于Windows系统是用的时间长，对其环境变量的配置也算比较了解。Windows的环境变量也分系统级别和用户级别的，并且是可视化的操作，因此也相对简单很多。 而在Linux、OS X这些系统来说，环境变量的配置都是直接操作文件，以前在使用Linux的时候，总有一种印象觉着比较麻烦，所以也一直都不怎么去详细了解。最近配置自己电脑OS X的环境变量，做了一些详细的了解，">
+<meta property="og:updated_time" content="2017-07-03T15:40:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="关于OS X的环境变量">
+<meta name="twitter:description" content="对于Windows的环境变量，由于Windows系统是用的时间长，对其环境变量的配置也算比较了解。Windows的环境变量也分系统级别和用户级别的，并且是可视化的操作，因此也相对简单很多。 而在Linux、OS X这些系统来说，环境变量的配置都是直接操作文件，以前在使用Linux的时候，总有一种印象觉着比较麻烦，所以也一直都不怎么去详细了解。最近配置自己电脑OS X的环境变量，做了一些详细的了解，">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post--e5-85-b3-e4-ba-8eos-x-e7-9a-84-e7-8e-af-e5-a2-83-e5-8f-98-e9-87-8f" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">关于OS X的环境变量</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2014.04.01</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/操作系统/">操作系统</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2014/04/01/-e5-85-b3-e4-ba-8eos-x-e7-9a-84-e7-8e-af-e5-a2-83-e5-8f-98-e9-87-8f/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>对于Windows的环境变量，由于Windows系统是用的时间长，对其环境变量的配置也算比较了解。Windows的环境变量也分系统级别和用户级别的，并且是可视化的操作，因此也相对简单很多。</p>
+<p>而在Linux、OS X这些系统来说，环境变量的配置都是直接操作文件，以前在使用Linux的时候，总有一种印象觉着比较麻烦，所以也一直都不怎么去详细了解。最近配置自己电脑OS X的环境变量，做了一些详细的了解，在这里记录一下。</p>
+<p>OS X是UNIX的直系亲属，Linux是类UNIX系统，因此OS X和Linux很多方面是一样的，两者在环境变量的配置也是一样的。多用户的OS X的环境变量自然也分为系统级的和用户级别的，而由于shell的不同，自然也有只供于特点shell的环境变量的配置文件。</p>
+<p>系统级别：</p>
+<p>全局的配置文件，也即无论任何shell都读取的配置文件/etc/profile。只是针对bash shell的系统环境变量配置文件/etc/bashrc。</p>
+<p>用户级别：</p>
+<p>位于用户目录下，即~/.bash_profile或~/.profile，可能有时候用户目录下是没有这个文件的，这样的话可以新建一个这样的文件。</p>
+<p>具体的一些变量说明：</p>
+<p>PATH这个变量包含了一系列由冒号分隔开的目录，系统就从这些目录里寻找可执行文件，也即Windows环境变量的PATH，注意OS X是用冒号隔开，而Windows是用分号隔开。</p>
+<p>ROOTPATH这个变量的功能和PATH相同，但它只罗列出超级用户（root）键入命令时所需检查的目录。</p>
+<p>LDPATH这个变量包含了一系列用冒号隔开的目录，动态链接器将在这些目录里查找库文件。</p>
+<p>MANPATH这个变量包含了一系列用冒号隔开的目录，命令man会在这些目录里搜索man页面。</p>
+<p>INFODIR这个变量包含了一系列用冒号隔开的目录，命令info将在这些目录里搜索info页面。</p>
+<p>PAGER这个变量包含了浏览文件内容的程序的路径（例如less或者more）。</p>
+<p>EDITOR这个变量包含了修改文件内容的程序（文件编辑器）的路径（比如nano或者vi）。</p>
+<p>KDEDIRS这个变量包含了一系列用冒号隔开的目录，里面放的是KDE相关的资料。</p>
+<p>CONFIG_PROTECT这个变量包含了一系列用空格隔开的目录，它们在更新的时候会被Portage保护起来。</p>
+<p>CONFIG_PROTECT_MASK这个变量包含了一系列用空格隔开的目录，它们在更新的时候不会被Portage保护起来。</p>
+<p>还有一些shell，echo用于显示某个变量，export用户设置某个变量。在OS X中，变量前的符号是$。可以直接是用export添加一条变量，例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">export PATH=$PATH:/usr/share/apache_maven/bin</div></pre></td></tr></table></figure>
+<p>这里需要注意，在配置PATH时，一定需要加上原来$PATH，负责会覆盖掉这个变量。</p>
+<p>如果是修改配置文件，即修改上面说的那个几个文件，文件内容例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">export M2_HOME=/usr/share/apche-maven</div><div class="line">export PATH=$PATH:$M2_HOME/bin</div></pre></td></tr></table></figure>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2014/04/01/-e5-85-b3-e4-ba-8eos-x-e7-9a-84-e7-8e-af-e5-a2-83-e5-8f-98-e9-87-8f/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

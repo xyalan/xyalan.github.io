@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>对iTerm输出的一些设置 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="第一次经过推荐知道了iTerm2，是用过之后发现确实比OS X的Terminal好用一些，当然也不排除自己对Terminal了解不够。默认情况下无论Terminal还是iTerm输出都是黑白的，看久了就会感觉很单调，输出若变为彩色则会丰富很多。 通过改变配置文件就可以实现这个。找到用户目录下的.bash_profile文件: 1vim ~/.bash_profile 使用vim编辑这个文件，只对b">
+<meta property="og:type" content="article">
+<meta property="og:title" content="对iTerm输出的一些设置">
+<meta property="og:url" content="http://yoursite.com/2014/05/25/-e5-af-b9iterm-e8-be-93-e5-87-ba-e7-9a-84-e4-b8-80-e4-ba-9b-e8-ae-be-e7-bd-ae/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="第一次经过推荐知道了iTerm2，是用过之后发现确实比OS X的Terminal好用一些，当然也不排除自己对Terminal了解不够。默认情况下无论Terminal还是iTerm输出都是黑白的，看久了就会感觉很单调，输出若变为彩色则会丰富很多。 通过改变配置文件就可以实现这个。找到用户目录下的.bash_profile文件: 1vim ~/.bash_profile 使用vim编辑这个文件，只对b">
+<meta property="og:updated_time" content="2017-07-03T15:40:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="对iTerm输出的一些设置">
+<meta name="twitter:description" content="第一次经过推荐知道了iTerm2，是用过之后发现确实比OS X的Terminal好用一些，当然也不排除自己对Terminal了解不够。默认情况下无论Terminal还是iTerm输出都是黑白的，看久了就会感觉很单调，输出若变为彩色则会丰富很多。 通过改变配置文件就可以实现这个。找到用户目录下的.bash_profile文件: 1vim ~/.bash_profile 使用vim编辑这个文件，只对b">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post--e5-af-b9iterm-e8-be-93-e5-87-ba-e7-9a-84-e4-b8-80-e4-ba-9b-e8-ae-be-e7-bd-ae" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">对iTerm输出的一些设置</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2014.05.25</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/服务器/">服务器</a>
+  </span>
+
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2014/05/25/-e5-af-b9iterm-e8-be-93-e5-87-ba-e7-9a-84-e4-b8-80-e4-ba-9b-e8-ae-be-e7-bd-ae/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>第一次经过推荐知道了iTerm2，是用过之后发现确实比OS X的Terminal好用一些，当然也不排除自己对Terminal了解不够。默认情况下无论Terminal还是iTerm输出都是黑白的，看久了就会感觉很单调，输出若变为彩色则会丰富很多。</p>
+<p>通过改变配置文件就可以实现这个。找到用户目录下的.bash_profile文件:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vim ~/.bash_profile</div></pre></td></tr></table></figure>
+<p>使用vim编辑这个文件，只对bash shell生效。添加如下片段：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">export CLICOLOR=1</div><div class="line">export LSCOLORS=gxfxcxdxbxegedabagacad</div><div class="line">export PS1=&apos;\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;36m\]\w\[\033[00m\]\$&apos;&lt;/pre&gt;</div></pre></td></tr></table></figure>
+<p>其中第一个边参数为1便表示打开彩色输出。</p>
+<p>上面只是让终端输出可以是彩色的，接着还需要自己去配色。打开iTerm，依次Preferences-&gt;Profiles-&gt;Colors，在这个标签卡上可以根据自己的需要配色。但是自己配色可能比较麻烦，晚上有比较多的配色方案，其中<a href="https://github.com/baskerville/iTerm-2-Color-Themes" title="iTerm-2-Color-Themes" target="_blank" rel="external">iTerm-2-Color-Themes</a>有自己感觉不错的方案。下载下来自己喜欢的方案，依然在Colors标签下，点击最下面的Load Preset，选择Import导入方案，再选择这个方案。打开一个新的iTerm窗口，就可以看到已经变彩色了。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2014/05/25/-e5-af-b9iterm-e8-be-93-e5-87-ba-e7-9a-84-e4-b8-80-e4-ba-9b-e8-ae-be-e7-bd-ae/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>
