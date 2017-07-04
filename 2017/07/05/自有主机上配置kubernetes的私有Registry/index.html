@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>自有主机上配置kubernetes的私有Registry | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="kubernetes docker," />
+  
+
+  <meta name="description" content="配置kubernetes的私有Registry使用私有Registry的认证信息在使用docker login [server]登录私有的Registry后，docker会把认证信息加密存储在$HOME/.docker/config.json文件里。之前在使用mesos/marathon集群时，都是通过marathon中的JSON中指定uri，即$HOME/.docker/config.json文">
+<meta name="keywords" content="kubernetes docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自有主机上配置kubernetes的私有Registry">
+<meta property="og:url" content="http://yoursite.com/2017/07/05/自有主机上配置kubernetes的私有Registry/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="配置kubernetes的私有Registry使用私有Registry的认证信息在使用docker login [server]登录私有的Registry后，docker会把认证信息加密存储在$HOME/.docker/config.json文件里。之前在使用mesos/marathon集群时，都是通过marathon中的JSON中指定uri，即$HOME/.docker/config.json文">
+<meta property="og:updated_time" content="2017-07-04T16:31:38.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="自有主机上配置kubernetes的私有Registry">
+<meta name="twitter:description" content="配置kubernetes的私有Registry使用私有Registry的认证信息在使用docker login [server]登录私有的Registry后，docker会把认证信息加密存储在$HOME/.docker/config.json文件里。之前在使用mesos/marathon集群时，都是通过marathon中的JSON中指定uri，即$HOME/.docker/config.json文">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#配置kubernetes的私有Registry"><span class="toc-text">配置kubernetes的私有Registry</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#使用私有Registry的认证信息"><span class="toc-text">使用私有Registry的认证信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用预拉取方式"><span class="toc-text">使用预拉取方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#在Pod中指定ImagePullSecrets"><span class="toc-text">在Pod中指定ImagePullSecrets</span></a></li></ol></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-自有主机上配置kubernetes的私有Registry" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">自有主机上配置kubernetes的私有Registry</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2017.07.05</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2017/07/05/自有主机上配置kubernetes的私有Registry/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h1 id="配置kubernetes的私有Registry"><a href="#配置kubernetes的私有Registry" class="headerlink" title="配置kubernetes的私有Registry"></a>配置kubernetes的私有Registry</h1><h2 id="使用私有Registry的认证信息"><a href="#使用私有Registry的认证信息" class="headerlink" title="使用私有Registry的认证信息"></a>使用私有Registry的认证信息</h2><p>在使用<code>docker login [server]</code>登录私有的Registry后，docker会把认证信息加密存储在<code>$HOME/.docker/config.json</code>文件里。之前在使用mesos/marathon集群时，都是通过marathon中的JSON中指定uri，即<code>$HOME/.docker/config.json</code>文件使marathon pull镜像时使用这个认证信息。</p>
+<p>在kubernetes里同样，只要把认证信息文件放到docker的默认位置<code>$HOME/.docker/config.json</code>，也就算是已经配置过docker的认证信息。实际上kubelet pull镜像时就是使用docker的命令，自然会去读取这个认证文件。</p>
+<p>需要配置认证信息，首先在一台node节点上登录：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker login server</div></pre></td></tr></table></figure>
+<p>这样认证信息已经存储或更新到<code>$HOME/.docker/config.json</code>中，打开<code>$HOME/.docker/config.json</code>查看认证信息是否正确。</p>
+<p>接下来获取kubernetes的node列表，如果只想获取所有node name的列表：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nodes=$(kubectl get nodes -o jsonpath='&#123;range.items[*].metadata&#125;&#123;.name&#125; &#123;end&#125;')</div></pre></td></tr></table></figure>
+<p>如果想获取所有node IP的列表：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nodes=$(kubectl get nodes -o jsonpath='&#123;range .items[*].status.addresses[?(@.type=="ExternalIP")]&#125;&#123;.address&#125; &#123;end&#125;')</div></pre></td></tr></table></figure>
+<p>截止根据上面获取的列表，通过一个脚本去把上述的认证信息copy到列表的机器：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">for n in $nodes; do scp ~/.docker/config.json root@$n:/root/.docker/config.json; done</div></pre></td></tr></table></figure>
+<p>然后通过创建一个包含私有镜像的pod来验证是否成功，关键一个<code>yaml</code>文件：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">cat &lt;&lt;EOF &gt; /tmp/private-image-test-1.yaml</div><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: private-image-test-1</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">    - name: uses-private-image</div><div class="line">      image: hub.fenxibao.com/base/node:7</div><div class="line">      imagePullPolicy: Always</div><div class="line">      command: [ "echo", "SUCCESS" ]</div><div class="line">EOF</div></pre></td></tr></table></figure>
+<p>创建pod：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kubectl create -f /tmp/private-image-test-1.yaml</div></pre></td></tr></table></figure>
+<p>然后可以查看日志检查镜像有没有成功pull：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kubectl logs private-image-test-1</div></pre></td></tr></table></figure>
+<h2 id="使用预拉取方式"><a href="#使用预拉取方式" class="headerlink" title="使用预拉取方式"></a>使用预拉取方式</h2><p>这种方式也就是说提前在节点中把需要的镜像pull到主机本地，之后使kubernetes使用这个本地的镜像即可。</p>
+<p>这种方式如上面所说，需要现在每个节点把镜像pull下来。接着在创建pod的时候指定<code>imagePullPolicy</code>的属性为<code>IfNotPresent</code>或<code>Never</code>，这样节点上的镜像久可以被使用，也不需要从<code>kubelet</code>从私有Registry去pull。</p>
+<h2 id="在Pod中指定ImagePullSecrets"><a href="#在Pod中指定ImagePullSecrets" class="headerlink" title="在Pod中指定ImagePullSecrets"></a>在Pod中指定ImagePullSecrets</h2><p>此种方式需要先配置一个secret，然后在创建pod时通过imagePullSecrets属性指定创建的secret。如果有多个registry即需要为每个分别创建一个secret。另外这种方式即通过引用pull secret方式只能在这个secret的namespace有效，因此如果有其他的namespace则需要每个namespace都这么配置一遍。</p>
+<p><strong>创建Secret</strong></p>
+<p>首先根据Docker的配置创建一个Secret：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kubectl create secret docker-registry myregistrykey --docker-server=DOCKER_REGISTRY_SERVER --docker-username=DOCKER_USER --docker-password=DOCKER_PASSWORD --docker-email=DOCKER_EMAIL</div></pre></td></tr></table></figure>
+<p>其中myregistrykey就是创建的secret的名字，<code>--docker-server</code>指registry的服务地址，<code>--docker-username</code>指registry账号，<code>--docker-password</code>指密码，<code>--docker-email</code>指邮箱。</p>
+<p>如果不便使用<code>kubectl</code>命令来创建secret，可以使用json或者yaml文件来创建。下面是一个yaml的示列：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">apiVersion: v1</div><div class="line">kind: Secret</div><div class="line">metadata:</div><div class="line">  name: myregistrykey</div><div class="line">  namespace: awesomeapps</div><div class="line">data:</div><div class="line">  .dockerconfigjson: UmVhbGx5IHJlYWxseSByZWVlZWVlZWVlZWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGx5eXl5eXl5eXl5eXl5eXl5eXl5eSBsbGxsbGxsbGxsbGxsbG9vb29vb29vb29vb29vb29vb29vb29vb29vb25ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubmdnZ2dnZ2dnZ2dnZ2dnZ2dnZ2cgYXV0aCBrZXlzCg==</div><div class="line">type: kubernetes.io/dockerconfigjson</div></pre></td></tr></table></figure>
+<p>其中注意的是对docker的配置文件(<code>.docker/config.json</code>)做base64编码，生成的字符串放在yaml中的.dockerconfigjson下，在设置其中的type为<code>kubernetes.io/dockerconfigjson</code>。</p>
+<p><strong>在pod中引用secret</strong><br>现在创建pods时添加<code>imagePullSecrets</code>属性来饮用secret，pod定义：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: foo</div><div class="line">  namespace: awesomeapps</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">    - name: foo</div><div class="line">      image: janedoe/awesomeapp:v1</div><div class="line">  imagePullSecrets:</div><div class="line">    - name: myregistrykey</div></pre></td></tr></table></figure>
+<p>提交创建这个pod：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kubectl create -f /tmp/private-image-test-1.yaml</div></pre></td></tr></table></figure>
+<p>然后就可以查看日志验证是否成功。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2017/07/05/自有主机上配置kubernetes的私有Registry/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>
