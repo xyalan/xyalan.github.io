@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>kubeadm安装kubernetes | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="docker kubernetes," />
+  
+
+  <meta name="description" content="目前Google官方提供了kubeadm来快速的初始化一个kubernetes集群，但是截止目前kubernetes 1.7为止仍然是一个beta版本。因此在初始化集群的时候会有相关的警告日志提示不要在生产环境这么操作。 安装前在安装最好检查一下kubernetes所使用的端口没有被占用，以下列出可能使用到的的端口。 Master Node    Port Range Purpose     64">
+<meta name="keywords" content="docker kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kubeadm安装kubernetes">
+<meta property="og:url" content="http://yoursite.com/2017/07/06/kubeadm安装kubernetes/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="目前Google官方提供了kubeadm来快速的初始化一个kubernetes集群，但是截止目前kubernetes 1.7为止仍然是一个beta版本。因此在初始化集群的时候会有相关的警告日志提示不要在生产环境这么操作。 安装前在安装最好检查一下kubernetes所使用的端口没有被占用，以下列出可能使用到的的端口。 Master Node    Port Range Purpose     64">
+<meta property="og:updated_time" content="2017-07-05T16:30:05.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="kubeadm安装kubernetes">
+<meta name="twitter:description" content="目前Google官方提供了kubeadm来快速的初始化一个kubernetes集群，但是截止目前kubernetes 1.7为止仍然是一个beta版本。因此在初始化集群的时候会有相关的警告日志提示不要在生产环境这么操作。 安装前在安装最好检查一下kubernetes所使用的端口没有被占用，以下列出可能使用到的的端口。 Master Node    Port Range Purpose     64">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#安装前"><span class="toc-text">安装前</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装基础组件"><span class="toc-text">安装基础组件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#初始化集群"><span class="toc-text">初始化集群</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-kubeadm安装kubernetes" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">kubeadm安装kubernetes</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2017.07.06</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2017/07/06/kubeadm安装kubernetes/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>目前Google官方提供了kubeadm来快速的初始化一个kubernetes集群，但是截止目前<code>kubernetes 1.7</code>为止仍然是一个<code>beta</code>版本。因此在初始化集群的时候会有相关的警告日志提示不要在生产环境这么操作。</p>
+<h2 id="安装前"><a href="#安装前" class="headerlink" title="安装前"></a>安装前</h2><p>在安装最好检查一下kubernetes所使用的端口没有被占用，以下列出可能使用到的的端口。</p>
+<p><strong>Master Node</strong></p>
+<table>
+<thead>
+<tr>
+<th>Port Range</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6443*    Kubernetes</td>
+<td>API server</td>
+</tr>
+<tr>
+<td>2379-2380</td>
+<td>etcd server client API</td>
+</tr>
+<tr>
+<td>10250</td>
+<td>Kubelet API</td>
+</tr>
+<tr>
+<td>10251</td>
+<td>kube-scheduler</td>
+</tr>
+<tr>
+<td>10252</td>
+<td>kube-controller-manager</td>
+</tr>
+<tr>
+<td>10255</td>
+<td>Read-only Kubelet API (Heapster)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Worker Node</strong></p>
+<table>
+<thead>
+<tr>
+<th>Port Range</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10250</td>
+<td>Kubelet API</td>
+</tr>
+<tr>
+<td>10255</td>
+<td>Read-only Kubelet API (Heapster)</td>
+</tr>
+<tr>
+<td>30000-32767</td>
+<td>Default port range for NodePort Services. Typically, these ports would need to be exposed to external load-balancers, or other external consumers of the application itself.</td>
+</tr>
+</tbody>
+</table>
+<p>除此之外在安装的Pod网络插件，也可能需要某些端口不被占用，具体要参看所使用的插件。</p>
+<h2 id="安装基础组件"><a href="#安装基础组件" class="headerlink" title="安装基础组件"></a>安装基础组件</h2><p><strong>Docker</strong><br>在每一个节点安装docker，官方推荐的版本是<code>1.12</code>。 <code>1.11</code>和<code>1.10</code>也可以使用。因为我说使用的机器本身已经安装了最新版本的docker，即docker改变版本号规则后的版本<code>17.0-ce</code>，在默认<code>kubeadm</code>不加任何参数初始化集群的时候导致无法识别版本号而报错。</p>
+<p>对于centos系统添加该版本的源：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">cat &lt;&lt;EOF &gt; /etc/yum.repos.d/docker.repo</div><div class="line">[dockerrepo]</div><div class="line">name=Docker Repository</div><div class="line">baseurl=https://yum.dockerproject.org/repo/main/centos/7/</div><div class="line">enabled=1</div><div class="line">gpgcheck=1</div><div class="line">gpgkey=https://yum.dockerproject.org/gpg</div><div class="line">EOF</div></pre></td></tr></table></figure>
+<p>接着查看可见的docker包：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"># yum list docker-engine.x86_64 --showduplicates | sort -r</div><div class="line"> * updates: mirrors.163.com</div><div class="line">Loading mirror speeds from cached hostfile</div><div class="line">Loaded plugins: fastestmirror, langpacks</div><div class="line"> * extras: repo.virtualhosting.hk</div><div class="line">docker-engine.x86_64             1.9.1-1.el7.centos                   dockerrepo</div><div class="line">docker-engine.x86_64             1.9.0-1.el7.centos                   dockerrepo</div><div class="line">docker-engine.x86_64             1.8.3-1.el7.centos                   dockerrepo</div><div class="line">docker-engine.x86_64             1.8.2-1.el7.centos                   dockerrepo</div><div class="line">docker-engine.x86_64             1.8.1-1.el7.centos                   dockerrepo</div><div class="line">docker-engine.x86_64             1.8.0-1.el7.centos                   dockerrepo</div><div class="line">docker-engine.x86_64             1.7.1-1.el7.centos                   dockerrepo</div><div class="line">docker-engine.x86_64             17.05.0.ce-1.el7.centos              dockerrepo</div><div class="line">docker-engine.x86_64             17.04.0.ce-1.el7.centos              dockerrepo</div><div class="line">docker-engine.x86_64             17.03.1.ce-1.el7.centos              dockerrepo</div><div class="line">docker-engine.x86_64             17.03.0.ce-1.el7.centos              dockerrepo</div><div class="line">docker-engine.x86_64             1.7.0-1.el7.centos                   dockerrepo</div><div class="line">docker-engine.x86_64             1.13.1-1.el7.centos                  dockerrepo</div><div class="line">docker-engine.x86_64             1.13.0-1.el7.centos                  dockerrepo</div><div class="line">docker-engine.x86_64             1.12.6-1.el7.centos                  dockerrepo</div><div class="line">......            </div><div class="line"> * base: mirrors.163.com</div><div class="line">Available Packages</div></pre></td></tr></table></figure>
+<p>这里需要安装<code>1.12</code>版本的docker，就可以通过包管理器安装并启动服务：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum install docker-engine-1.12.6-1.el7.centos</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">systemctl start docker</div><div class="line">systemctl enable docker</div></pre></td></tr></table></figure>
+<p><strong>kubelet和kubeadm</strong></p>
+<p>kubelet是node上的核心组件，主要负责启动pod和容器等事情。kubeadm命令就用于初始化集群。添加这两个组件的安装源：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">cat &lt;&lt;EOF &gt; /etc/yum.repos.d/kubernetes.repo</div><div class="line">[kubernetes]</div><div class="line">name=Kubernetes</div><div class="line">baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64</div><div class="line">enabled=1</div><div class="line">gpgcheck=1</div><div class="line">repo_gpgcheck=1</div><div class="line">gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg</div><div class="line">        https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg</div><div class="line">EOF</div><div class="line">setenforce 0</div></pre></td></tr></table></figure>
+<p>然后安装并启用服务：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">yum install -y kubelet kubeadm</div><div class="line">systemctl enable kubelet &amp;&amp; systemctl start kubelet</div></pre></td></tr></table></figure>
+<h2 id="初始化集群"><a href="#初始化集群" class="headerlink" title="初始化集群"></a>初始化集群</h2><p><strong>Master</strong></p>
+<p>master节点是控制面板运行的节点，包括etcd、以及与<code>kubectl</code>通信的API服务。初始化master节点直接在一台机器运行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kubeadm init</div></pre></td></tr></table></figure>
+<p>这样就开始master节点的初始化配置工作，默认的就会自动检测网络接口为master的默认网关接口。可以通过参数<code>--apiserver-advertise-address=&lt;ip-address&gt;</code>来指定自己想要的。当然<code>kubeadm init</code>首先会做一系列的检查操作，来检查是否适合安装kubernetes，包括检查docker版本等。通过检查则会下载并安装集群的数据库和控制面板组件。初始化完成之后，输出的内容中最后会有下面的内容：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">Your Kubernetes master has initialized successfully!</div><div class="line"></div><div class="line">To start using your cluster, you need to run (as a regular user):</div><div class="line"></div><div class="line">  mkdir -p $HOME/.kube</div><div class="line">  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config</div><div class="line">  sudo chown $(id -u):$(id -g) $HOME/.kube/config</div><div class="line"></div><div class="line">You should now deploy a pod network to the cluster.</div><div class="line">Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:</div><div class="line">  http://kubernetes.io/docs/admin/addons/</div><div class="line"></div><div class="line">You can now join any number of machines by running the following on each node</div><div class="line">as root:</div><div class="line"></div><div class="line">  kubeadm join --token &lt;token&gt; &lt;master-ip&gt;:&lt;master-port&gt;</div></pre></td></tr></table></figure>
+<p>然后安装Pod的网络附件，在部署应用之前必须先安装网络附件。kubeadm仅仅支持Container Network Interface (CNI)网络，不支持kubenet。这里选择weave：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kubectl apply -n kube-system -f &quot;https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d &apos;\n&apos;)&quot;</div></pre></td></tr></table></figure>
+<p>另外需要选择的网络附件必须匹配安装的kubernetes版本，否则可能出现奇怪的错误。使用<code>kubectl get pods --all-namespaces</code>查看运行的Pod，只要有kube-dns的Pod状态为运行则表示网络附件安装成功。</p>
+<p>默认集群是不会调度pods在master节点的，因此如果只有一台机器想要pods可以调度在master，则执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kubectl taint nodes --all node-role.kubernetes.io/master-</div></pre></td></tr></table></figure>
+<p>这样master节点已经初始化完成，并且可以创建一个Pod。</p>
+<p><strong>Node</strong></p>
+<p>如果有多个机器，master已经初始化完成，接着就需要其他node节点加入到master。首选需要一个token，在<code>kubeadm init</code>初始化一个集群时已经生成了一个token。使用<code>kubeadm token list</code>可以查看当前已经存在的token，包括过期时间及用途。也可使用<a href="https://kubernetes.io/docs/admin/kubeadm/#manage-tokens" target="_blank" rel="external"><code>kubeadm token create</code></a>或<code>kubeadm token generate</code>创建一个本地的token。<code>kubeadm token generate</code>与<code>kubeadm token create</code>的区别在于前者生成的token可以在<code>kubeadm init</code>时通过<code>--token</code>参数指定。</p>
+<p>根据上面获得的token分别在node机器上执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kubeadm join --token &lt;token&gt; &lt;master-ip&gt;:&lt;master-port&gt;</div></pre></td></tr></table></figure>
+<p>输出的结果如包含下面内容表示已经加入成功：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Node join complete:</div><div class="line">* Certificate signing request sent to master and response</div><div class="line">  received.</div><div class="line">* Kubelet informed of new secure connection details.</div><div class="line"></div><div class="line">Run &apos;kubectl get nodes&apos; on the master to see this machine join.</div></pre></td></tr></table></figure>
+<p>之后在master上运行<code>kubectl get nodes</code>可以获得node列表。</p>
+<p>为了在工作机器上通过<code>kubectl</code>访问到集群，可以复制master上的kubeconfig文件到工作机器：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">scp root@&lt;master ip&gt;:/etc/kubernetes/admin.conf .</div><div class="line">kubectl --kubeconfig ./admin.conf get nodes</div></pre></td></tr></table></figure>
+<p>如果想要在集群外部访问API服务，则可以配置API服务的代理：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">scp root@&lt;master ip&gt;:/etc/kubernetes/admin.conf .</div><div class="line">kubectl --kubeconfig ./admin.conf proxy</div></pre></td></tr></table></figure>
+<p>这样就可以通过<code>http://localhost:8001/api/v1</code>访问API。查看<code>/etc/kubernetes/admin.conf</code>文件可以看到集群的一些配置，包括访问地址端口号及用户信息。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2017/07/06/kubeadm安装kubernetes/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>
