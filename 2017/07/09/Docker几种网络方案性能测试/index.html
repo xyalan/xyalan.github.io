@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>Docker几种网络方案性能测试 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="Docker由于发展迅速，初期对网络有太多的关注。 1.9以前网络的方式只有bridge、host和none三种模式。 bridge模式就是在主机上创建一个虚拟网桥，然后同一个主机上的容器都挂在上桥上，同一个主机上的容器可以直接通信，但是跨主机只能通过和主机映射端口的方式通信。这样扩展性比较差，同时也主机的端口也是一种消耗。 host则是让容器和主机共用网络空间，none则是不分配。 本次来测试两">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker几种网络方案性能测试">
+<meta property="og:url" content="http://yoursite.com/2017/07/09/Docker几种网络方案性能测试/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="Docker由于发展迅速，初期对网络有太多的关注。 1.9以前网络的方式只有bridge、host和none三种模式。 bridge模式就是在主机上创建一个虚拟网桥，然后同一个主机上的容器都挂在上桥上，同一个主机上的容器可以直接通信，但是跨主机只能通过和主机映射端口的方式通信。这样扩展性比较差，同时也主机的端口也是一种消耗。 host则是让容器和主机共用网络空间，none则是不分配。 本次来测试两">
+<meta property="og:updated_time" content="2017-07-09T17:00:02.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Docker几种网络方案性能测试">
+<meta name="twitter:description" content="Docker由于发展迅速，初期对网络有太多的关注。 1.9以前网络的方式只有bridge、host和none三种模式。 bridge模式就是在主机上创建一个虚拟网桥，然后同一个主机上的容器都挂在上桥上，同一个主机上的容器可以直接通信，但是跨主机只能通过和主机映射端口的方式通信。这样扩展性比较差，同时也主机的端口也是一种消耗。 host则是让容器和主机共用网络空间，none则是不分配。 本次来测试两">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#BRIDGE"><span class="toc-text">BRIDGE</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Docker-overlay"><span class="toc-text">Docker overlay</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-Docker几种网络方案性能测试" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">Docker几种网络方案性能测试</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2017.07.09</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2017/07/09/Docker几种网络方案性能测试/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>Docker由于发展迅速，初期对网络有太多的关注。 <code>1.9</code>以前网络的方式只有<code>bridge</code>、<code>host</code>和<code>none</code>三种模式。</p>
+<p><code>bridge</code>模式就是在主机上创建一个虚拟网桥，然后同一个主机上的容器都挂在上桥上，同一个主机上的容器可以直接通信，但是跨主机只能通过和主机映射端口的方式通信。这样扩展性比较差，同时也主机的端口也是一种消耗。</p>
+<p><code>host</code>则是让容器和主机共用网络空间，<code>none</code>则是不分配。</p>
+<p>本次来测试两个容器在夸主机情况下的网络性能，使用的测试工具为<a href="https://linux.die.net/man/1/qperf" target="_blank" rel="external"><code>qperf</code></a>。因此要测试容器的网络性能，使用已经包含<code>qperf</code>的镜像<code>arjanschaaf/centos-qperf</code>。两台机器系统都是Ubuntu16.04，安装的docker版本是<code>1.12.6</code>，IP分别是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">172.18.240.119</div><div class="line">172.18.115.116</div></pre></td></tr></table></figure>
+<h2 id="BRIDGE"><a href="#BRIDGE" class="headerlink" title="BRIDGE"></a>BRIDGE</h2><p><code>bridge</code>在夸主机时，两个容器可通过端口映射加主机IP的方式通信。在<code>116</code>上运行<code>qperf</code>的服务端：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -dti --name qperf-server -p 4000:4000 -p 4001:4001 arjanschaaf/centos-qperf -lp 4000</div></pre></td></tr></table></figure>
+<p>接着在<code>119</code>上运行客户端等待测试结果，最终返回的测试结果为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># docker run -ti --rm arjanschaaf/centos-qperf 172.18.115.116 -lp 4000 -ip 4001  tcp_bw tcp_lat conf</span></div><div class="line">tcp_bw:</div><div class="line">    bw  =  152 MB/sec</div><div class="line">tcp_lat:</div><div class="line">    latency  =  396 us</div><div class="line">conf:</div><div class="line">    loc_node   =  d13949a45330</div><div class="line">    loc_cpu    =  Intel Xeon E5-2682 v4 @ 2.50GHz</div><div class="line">    loc_os     =  Linux 4.4.0-82-generic</div><div class="line">    loc_qperf  =  0.4.9</div><div class="line">    rem_node   =  5eb5c49a1903</div><div class="line">    rem_cpu    =  Intel Xeon E5-2680 v3 @ 2.50GHz</div><div class="line">    rem_os     =  Linux 4.4.0-82-generic</div><div class="line">    rem_qperf  =  0.4.9</div></pre></td></tr></table></figure>
+<h2 id="Docker-overlay"><a href="#Docker-overlay" class="headerlink" title="Docker overlay"></a>Docker overlay</h2><p>此种方式需要Docker <code>1.9</code>版本以上，并且因为基于VXLAN，因此也需要内核支持。参考之前的文章配置<a href="http://hialan.com/2017/07/03/配置Docker的跨主机通信网络/" target="_blank" rel="external">Docker overlay</a>。这里创建的网络叫<code>multi-host</code>。</p>
+<p>同样在<code>116</code>上运行<code>qperf</code>的服务端，现在的网络已经支持跨主机通信，因此运行容器时指定这个网络不再需要映射端口：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -dti --name qperf-server --net multi-host arjanschaaf/centos-qperf -lp 4000</div></pre></td></tr></table></figure>
+<p>在<code>119</code>通过<code>docker network inspect multi-host</code> 便能查看到<code>116</code>上运行的<code>qperf-server</code>所分配的IP：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"># docker network inspect multi-host</div><div class="line">[</div><div class="line">    &#123;</div><div class="line">        &quot;Name&quot;: &quot;multi-host&quot;,</div><div class="line">        ...</div><div class="line">        &quot;Containers&quot;: &#123;</div><div class="line">            ...</div><div class="line">            &quot;ep-55eb2b063a416ef09f41b58a8b69d9724a3e7d108907847a18d0e76f1d890a9b&quot;: &#123;</div><div class="line">                &quot;Name&quot;: &quot;qperf-server&quot;,</div><div class="line">                &quot;EndpointID&quot;: &quot;55eb2b063a416ef09f41b58a8b69d9724a3e7d108907847a18d0e76f1d890a9b&quot;,</div><div class="line">                &quot;MacAddress&quot;: &quot;02:42:0a:0a:0a:03&quot;,</div><div class="line">                &quot;IPv4Address&quot;: &quot;10.10.10.3/24&quot;,</div><div class="line">                &quot;IPv6Address&quot;: &quot;&quot;</div><div class="line">            &#125;</div><div class="line">        &#125;,</div><div class="line">        ...</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
+<p>现在可以看到<code>qperf-server</code>分配到的IP是<code>10.10.10.3</code>，在<code>119</code>同样指定此网络运行客户端：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"># docker run -ti --rm --net multi-host arjanschaaf/centos-qperf 10.10.10.3 -lp 4000 -ip 4001  tcp_bw tcp_lat conf</div><div class="line">tcp_bw:</div><div class="line">    bw  =  146 MB/sec</div><div class="line">tcp_lat:</div><div class="line">    latency  =  417 us</div><div class="line">conf:</div><div class="line">    loc_node   =  4a50f11e4cff</div><div class="line">    loc_cpu    =  Intel Xeon E5-2682 v4 @ 2.50GHz</div><div class="line">    loc_os     =  Linux 4.4.0-82-generic</div><div class="line">    loc_qperf  =  0.4.9</div><div class="line">    rem_node   =  30b8c63c1efa</div><div class="line">    rem_cpu    =  Intel Xeon E5-2680 v3 @ 2.50GHz</div><div class="line">    rem_os     =  Linux 4.4.0-82-generic</div><div class="line">    rem_qperf  =  0.4.9</div></pre></td></tr></table></figure>
+<p>未完待续…</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2017/07/09/Docker几种网络方案性能测试/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>
