@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>为Docker配置flannel网络 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="Docker的覆盖式跨主机网络有很多第三方的解决方案，其中flannelcoreOS提供的一种方案，并且支持Kubernetes。 本次的主要目的配置flannel网络，flannel同样需要一个额外的KV存储系统，它支持etcd。本次配置有两台机器： 12172.18.240.119172.18.115.116 安装etcd这个不多做说明，假设已经已经下载编译过的etcd，在解压过后的目录中启动">
+<meta property="og:type" content="article">
+<meta property="og:title" content="为Docker配置flannel网络">
+<meta property="og:url" content="http://yoursite.com/2017/07/10/为Docker配置flannel网络/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="Docker的覆盖式跨主机网络有很多第三方的解决方案，其中flannelcoreOS提供的一种方案，并且支持Kubernetes。 本次的主要目的配置flannel网络，flannel同样需要一个额外的KV存储系统，它支持etcd。本次配置有两台机器： 12172.18.240.119172.18.115.116 安装etcd这个不多做说明，假设已经已经下载编译过的etcd，在解压过后的目录中启动">
+<meta property="og:updated_time" content="2017-07-10T15:08:11.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="为Docker配置flannel网络">
+<meta name="twitter:description" content="Docker的覆盖式跨主机网络有很多第三方的解决方案，其中flannelcoreOS提供的一种方案，并且支持Kubernetes。 本次的主要目的配置flannel网络，flannel同样需要一个额外的KV存储系统，它支持etcd。本次配置有两台机器： 12172.18.240.119172.18.115.116 安装etcd这个不多做说明，假设已经已经下载编译过的etcd，在解压过后的目录中启动">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#安装etcd"><span class="toc-text">安装etcd</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装flannel"><span class="toc-text">安装flannel</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-为Docker配置flannel网络" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">为Docker配置flannel网络</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2017.07.10</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2017/07/10/为Docker配置flannel网络/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>Docker的覆盖式跨主机网络有很多第三方的解决方案，其中<code>flannel</code>coreOS提供的一种方案，并且支持Kubernetes。</p>
+<p>本次的主要目的配置<code>flannel</code>网络，<code>flannel</code>同样需要一个额外的KV存储系统，它支持etcd。本次配置有两台机器：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">172.18.240.119</div><div class="line">172.18.115.116</div></pre></td></tr></table></figure>
+<h2 id="安装etcd"><a href="#安装etcd" class="headerlink" title="安装etcd"></a>安装etcd</h2><p>这个不多做说明，假设已经已经下载编译过的etcd，在解压过后的目录中启动etcd：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./etcd --advertise-client-urls http://172.18.240.119:2380 --listen-client-urls http://172.18.240.119:2379,http://127.0.0.1:2379 &gt; etcd.log 2&gt;&amp;1 &amp;</div></pre></td></tr></table></figure>
+<h2 id="安装flannel"><a href="#安装flannel" class="headerlink" title="安装flannel"></a>安装flannel</h2><p>在官方<a href="https://github.com/coreos/flannel/releases" target="_blank" rel="external"><code>releases列表</code></a>中选择一个合适的包，本次两台机器均为Ubuntu系统。登录119机器下载已经编译好的包：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># wget https://github.com/coreos/flannel/releases/download/v0.7.1/flannel-v0.7.1-linux-amd64.tar.gz</span></div></pre></td></tr></table></figure>
+<p>解压并且启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># tar -xvf flannel-v0.7.1-linux-amd64.tar.gz</span></div><div class="line"><span class="comment"># ./flanneld &gt; flannel.log 2&gt;&amp;1 &amp;</span></div></pre></td></tr></table></figure>
+<p>这样启动后flanneld会一直等待获取到etcd的网络配置信息。默认flanneld读取的是etcd中<code>/coreos.com/network/config</code>下的配置，现在需要设置网络配置信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># curl http://127.0.0.1:2379/v2/keys/coreos.com/network/config -XPUT -d  value='&#123; "Network": "10.5.0.0/16", "Backend": &#123;"Type": "vxlan"&#125;&#125;'</span></div></pre></td></tr></table></figure>
+<p>其中<code>Network</code>就是需要配置的子网，<code>Type</code>指定网络的类型，flanneld是支持两种网络类型的。现在flanneld已经可以正常从etcd读取的网络配置。</p>
+<p>接下来需要和Docker集成，Docker daemon是支持<code>--bip</code>参数的，和Docker集成需要在Daemon中添加此参数。而默认flanneld会把网路片配置存储在<code>/run/flannel/subnet.env</code>文件中：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># cat /run/flannel/subnet.env</span></div><div class="line">FLANNEL_NETWORK=10.5.0.0/16</div><div class="line">FLANNEL_SUBNET=10.5.82.1/24</div><div class="line">FLANNEL_MTU=1450</div><div class="line">FLANNEL_IPMASQ=<span class="literal">false</span></div></pre></td></tr></table></figure>
+<p>Docker是用Systemd启动的，添加EnvironmentFile并指定<code>/run/flannel/subnet.env</code>文件，然后添加启动参数，修改的服务如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line">[Service]</div><div class="line">Type=notify</div><div class="line"><span class="meta">#</span><span class="bash"> the default is not to use systemd <span class="keyword">for</span> cgroups because the delegate issues still</span></div><div class="line"><span class="meta">#</span><span class="bash"> exists and systemd currently does not support the cgroup feature <span class="built_in">set</span> required</span></div><div class="line"><span class="meta">#</span><span class="bash"> <span class="keyword">for</span> containers run by docker</span></div><div class="line">EnvironmentFile=-/etc/default/docker</div><div class="line">EnvironmentFile=-/run/flannel/subnet.env</div><div class="line">ExecStart=/usr/bin/dockerd -H fd:// $DOCKER_OPTS  --bip=$&#123;FLANNEL_SUBNET&#125; --mtu=$&#123;FLANNEL_MTU&#125;</div><div class="line">ExecReload=/bin/kill -s HUP $MAINPID</div><div class="line">...</div></pre></td></tr></table></figure>
+<p>可以看到添加了启动参数<code>--bip=${FLANNEL_SUBNET} --mtu=${FLANNEL_MTU}</code>，分别指定当前机器所属的子网，以及MTU大小。现在重启服务：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># systemctl daemon-reload</span></div><div class="line"><span class="comment"># systemctl restart docker</span></div></pre></td></tr></table></figure>
+<p>现在119上已经配置好flanneld网络并已集成到Docker，再登录116机器。由于etcd已经在119上部署，在116机器直接启动并指定etcd地址：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># ./flanneld -etcd-endpoints=http://172.18.240.119:2379 &gt; flanneld.log 2&gt;&amp;1 &amp;</span></div></pre></td></tr></table></figure>
+<p>同样修改Systemd的服务配置为Docker添加flanneld参数然后重启服务。现在116上运行一个容器并不用再指定网络模式：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># docker run -dti --name qperf-server-fla arjanschaaf/centos-qperf -lp 4000</span></div></pre></td></tr></table></figure>
+<p>检查该容器的网络：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># docker inspect qperf-server-fla</span></div><div class="line">...</div><div class="line"><span class="string">"Networks"</span>: &#123;</div><div class="line">      <span class="string">"bridge"</span>: &#123;</div><div class="line">          <span class="string">"IPAMConfig"</span>: null,</div><div class="line">          <span class="string">"Links"</span>: null,</div><div class="line">          <span class="string">"Aliases"</span>: null,</div><div class="line">          <span class="string">"NetworkID"</span>: <span class="string">"975c88dd2f4cebcd2bdf7b5aec15825df9eab354325f3b8b7b01bb7fee512c1d"</span>,</div><div class="line">          <span class="string">"EndpointID"</span>: <span class="string">"a50315ec2efbe4b6373e3e63b5bdac77acc4047c14c6b565ad3e7f0e7c787972"</span>,</div><div class="line">          <span class="string">"Gateway"</span>: <span class="string">"10.5.10.1"</span>,</div><div class="line">          <span class="string">"IPAddress"</span>: <span class="string">"10.5.10.2"</span>,</div><div class="line">          <span class="string">"IPPrefixLen"</span>: 24,</div><div class="line">          <span class="string">"IPv6Gateway"</span>: <span class="string">""</span>,</div><div class="line">          <span class="string">"GlobalIPv6Address"</span>: <span class="string">""</span>,</div><div class="line">          <span class="string">"GlobalIPv6PrefixLen"</span>: 0,</div><div class="line">          <span class="string">"MacAddress"</span>: <span class="string">"02:42:0a:05:0a:02"</span></div><div class="line">      &#125;</div><div class="line">&#125;</div><div class="line">...</div></pre></td></tr></table></figure>
+<p>可以看到分配的IP已经是子网下的IP，在119上运行另一个容器并测试网络：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"># docker run -ti --rm arjanschaaf/centos-qperf -v 10.5.10.2 -lp 4000 -ip 4001  tcp_bw tcp_lat conf</div><div class="line">tcp_bw:</div><div class="line">    bw              =    146 MB/sec</div><div class="line">    msg_rate        =   2.23 K/sec</div><div class="line">    port            =  4,001</div><div class="line">    send_cost       =    505 ms/GB</div><div class="line">    recv_cost       =   5.29 sec/GB</div><div class="line">    send_cpus_used  =    7.5 % cpus</div><div class="line">    recv_cpus_used  =   77.5 % cpus</div><div class="line">tcp_lat:</div><div class="line">    latency        =    399 us</div><div class="line">    msg_rate       =   2.51 K/sec</div><div class="line">    port           =  4,001</div><div class="line">    loc_cpus_used  =      6 % cpus</div><div class="line">    rem_cpus_used  =      3 % cpus</div><div class="line">conf:</div><div class="line">    loc_node   =  94a29f4e7573</div><div class="line">    loc_cpu    =  Intel Xeon E5-2682 v4 @ 2.50GHz</div><div class="line">    loc_os     =  Linux 4.4.0-82-generic</div><div class="line">    loc_qperf  =  0.4.9</div><div class="line">    rem_node   =  847d3f0c7aad</div><div class="line">    rem_cpu    =  Intel Xeon E5-2680 v3 @ 2.50GHz</div><div class="line">    rem_os     =  Linux 4.4.0-82-generic</div><div class="line">    rem_qperf  =  0.4.9</div></pre></td></tr></table></figure>
+<p>已经可以正常通信，这是其中的网络性能测试结果。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2017/07/10/为Docker配置flannel网络/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>
