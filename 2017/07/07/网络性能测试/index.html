@@ -21,7 +21,7 @@
 <meta property="og:url" content="http://yoursite.com/2017/07/07/网络性能测试/index.html">
 <meta property="og:site_name" content="That&#39;s a interesting">
 <meta property="og:description" content="Docker的覆盖式跨主机网络有很多第三方的解决方案，其中flannelcoreOS提供的一种方案，并且支持Kubernetes。 本次的主要目的配置flannel网络，flannel同样需要一个额外的KV存储系统，它支持etcd。本次配置有两台机器： 12172.18.240.119172.18.115.116 安装etcd这个不多做说明，假设已经已经下载编译过的etcd，在解压过后的目录中启动">
-<meta property="og:updated_time" content="2017-07-10T14:57:42.000Z">
+<meta property="og:updated_time" content="2017-07-10T15:02:06.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络性能测试">
 <meta name="twitter:description" content="Docker的覆盖式跨主机网络有很多第三方的解决方案，其中flannelcoreOS提供的一种方案，并且支持Kubernetes。 本次的主要目的配置flannel网络，flannel同样需要一个额外的KV存储系统，它支持etcd。本次配置有两台机器： 12172.18.240.119172.18.115.116 安装etcd这个不多做说明，假设已经已经下载编译过的etcd，在解压过后的目录中启动">
@@ -193,7 +193,7 @@
 <p>本次的主要目的配置<code>flannel</code>网络，<code>flannel</code>同样需要一个额外的KV存储系统，它支持etcd。本次配置有两台机器：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">172.18.240.119</div><div class="line">172.18.115.116</div></pre></td></tr></table></figure>
 <h2 id="安装etcd"><a href="#安装etcd" class="headerlink" title="安装etcd"></a>安装etcd</h2><p>这个不多做说明，假设已经已经下载编译过的etcd，在解压过后的目录中启动etcd：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./etcd --advertise-client-urls http://172.18.240.119:2380 --listen-client-urls http://172.18.240.119:2379,http://127.0.0.1:2379 &gt; etcd.log 2&gt;&amp;1 &amp;</div></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># ./etcd --advertise-client-urls http://172.18.240.119:2380 --listen-client-urls http://172.18.240.119:2379,http://127.0.0.1:2379 &gt; etcd.log 2&gt;&amp;1 &amp;</span></div></pre></td></tr></table></figure>
 <h2 id="安装flannel"><a href="#安装flannel" class="headerlink" title="安装flannel"></a>安装flannel</h2><p>在官方<a href="https://github.com/coreos/flannel/releases" target="_blank" rel="external"><code>releases列表</code></a>中选择一个合适的包，本次两台机器均为Ubuntu系统。登录119机器下载已经编译好的包：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># wget https://github.com/coreos/flannel/releases/download/v0.7.1/flannel-v0.7.1-linux-amd64.tar.gz</span></div></pre></td></tr></table></figure>
 <p>解压并且启动：</p>
