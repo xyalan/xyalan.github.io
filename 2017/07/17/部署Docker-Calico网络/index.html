@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>部署Docker Calico网络 | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="Docker Calico," />
+  
+
+  <meta name="description" content="Calico是一种虚拟网络解决方案，不像其他的Weave、Flannel等专门支持Docker的方案，Calico支持容器、虚拟机、裸机服务等多种。同样他支持Kubernetes的CNI方案和Docker自己的CNM方案。在之前的公司做基于Mesos/Marathon的私有容器云的时候也选用这个这个方案。 架构Calico主要由几个互相依赖的组建组成，这些组件包括Felix、Orchestrato">
+<meta name="keywords" content="Docker Calico">
+<meta property="og:type" content="article">
+<meta property="og:title" content="部署Docker Calico网络">
+<meta property="og:url" content="http://yoursite.com/2017/07/17/部署Docker-Calico网络/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="Calico是一种虚拟网络解决方案，不像其他的Weave、Flannel等专门支持Docker的方案，Calico支持容器、虚拟机、裸机服务等多种。同样他支持Kubernetes的CNI方案和Docker自己的CNM方案。在之前的公司做基于Mesos/Marathon的私有容器云的时候也选用这个这个方案。 架构Calico主要由几个互相依赖的组建组成，这些组件包括Felix、Orchestrato">
+<meta property="og:updated_time" content="2017-07-17T17:34:03.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="部署Docker Calico网络">
+<meta name="twitter:description" content="Calico是一种虚拟网络解决方案，不像其他的Weave、Flannel等专门支持Docker的方案，Calico支持容器、虚拟机、裸机服务等多种。同样他支持Kubernetes的CNI方案和Docker自己的CNM方案。在之前的公司做基于Mesos/Marathon的私有容器云的时候也选用这个这个方案。 架构Calico主要由几个互相依赖的组建组成，这些组件包括Felix、Orchestrato">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#架构"><span class="toc-text">架构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#准备"><span class="toc-text">准备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装calicoctl"><span class="toc-text">安装calicoctl</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用"><span class="toc-text">使用</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-部署Docker-Calico网络" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">部署Docker Calico网络</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2017.07.17</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2017/07/17/部署Docker-Calico网络/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>Calico是一种虚拟网络解决方案，不像其他的Weave、Flannel等专门支持Docker的方案，Calico支持容器、虚拟机、裸机服务等多种。同样他支持Kubernetes的CNI方案和Docker自己的CNM方案。在之前的公司做基于Mesos/Marathon的私有容器云的时候也选用这个这个方案。</p>
+<h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><p>Calico主要由几个互相依赖的组建组成，这些组件包括<code>Felix</code>、<code>Orchestrator plugin</code>、<code>etcd</code>、<code>BIRD</code>、<code>BGP Route Reflector (BIRD)</code>。</p>
+<p><strong>Felix</strong></p>
+<p>它是运行在每一个节点上的一个代理，为诸如每个节点上的容器或者虚拟机提供端口。负责路由的维护和ACL权限的控制以为每个主机端口提供需要的连接。</p>
+<p>Calico支持多种环境，因此依赖于不同的环境Felix负责的任务包括：</p>
+<ul>
+<li>处理接口到系统内核的信息从而从内核中获取到来正确的处理通过入口所产生的流量；他通常就是确保主机通过其上的MAC地址响应来自每一个workload上ARP请求，并且转发IP包到他所管理的接口。通常在创建一个容器后，Felix就会系统网络中创建一个<code>calic</code>开头的网络接口，即它会监控接口的创建与清理以此确保对这些接口的编程应用在合适的时间。</li>
+<li>还负责规划端口到主机内核中FIB的路由，这确保了到达主机端口上的数据包得到响应的转发。</li>
+<li>还会负责在Linux内核中ACL的规划，这些ACL用来保证仅仅只有有效的流量能在端口之间发送，也确保了端口不能绕过Calico的安全措施。</li>
+<li>最后它还负责提供网络健康状态的数据，它会报告主机配置的一些错误和问题。这些数据会被写入到etcd使其他组件和网络维护人员可见。</li>
+</ul>
+<p><strong>Orchestrator插件</strong></p>
+<p>它主要是适配不同的平台，比如OpenStack或者Kubernetes。其主要目的就在于绑定Calico与对应平台的，以使用户可以使用对应平台的工具来管理Calico网络。比如Calico的Neutron ML2驱动就是一个插件，它可以集成Neutron’s ML2插件然后让用户通过Neutron API的调用来配置和管理Calico网络。</p>
+<p>插件提供的功能包括：</p>
+<ul>
+<li>它包含网络管理的的API集合，然后以翻译这些API转换成 Calico的数据模型并存储在Calico的存储系统中。</li>
+<li>其次就是提供一些网络的反馈，比如提供Felix存活情况的信息，当网络安装失败标记一些端口为失败的。</li>
+</ul>
+<p><strong>etcd</strong></p>
+<p>etcd本身是一个分布式的KV存储，Calico使用它来完成不同组件之间的通信协作，以及确保Calico总是能构建一个正确的网络需要的一致性存储系统。</p>
+<p><strong>BGP Client</strong></p>
+<p>Calico会在每一个Felix的主机节点上部署一个BGP客户端，BGP客户端的角色用来读取Felix编程到内核的路由状态并且分发这些路由到整个数据中心。最主要的功能就是路由分发。</p>
+<p><strong>BGP Route Reflector</strong></p>
+<p>一些大规模的部署，简单的BGP成为一个瓶颈，因为需要每个BGP客户端连接到整个网络拓扑的其他BGP客户端，这就导致了连接迅速的增加难以维护。因此在大规模的部署中，Calico会部署一个BGP Route Reflector。这个组件通常用于互联网当中，扮演一个中心指向BGP客户端的连接，防止它们需要和集群中其他单独的BGP客户端通信。</p>
+<p>冗余多个BGP route reflectors可以达到无缝的部署。当BGP客户端公布它的FIB(Forwarding Information Base)路由到route reflector上时，route reflector则会公布这些路由到部署中的其他节点。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p><strong>etcd</strong></p>
+<p>首先需要部署一个etcd集群，在测试时起先使用的是之前部署Docker overlay时使用的单节点的etcd，但发现死后都无法成功。一直提示etcd集群不可用。因为已经有三台阿里云：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">172.18.115.116</div><div class="line">172.18.240.120</div><div class="line">172.18.240.119</div></pre></td></tr></table></figure>
+<p>我分别在买个机器部署一个etcd组成一个3节点的集群。我使用静态部署etcd，因此先创建一个shell脚本叫做<code>etcd.sh</code>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#!/bin/bash</span></div><div class="line">./etcd --name enode1 --initial-advertise-peer-urls http://172.18.115.116:2380 \</div><div class="line">        --listen-peer-urls http://172.18.115.116:2380 \</div><div class="line">        --advertise-client-urls http://172.18.115.116:2379 \</div><div class="line">        --listen-client-urls http://172.18.115.116:2379 \</div><div class="line">        --initial-cluster-token etcd-cluster \</div><div class="line">        --initial-cluster enode1=http://172.18.240.119:2380,enode2=http://172.18.115.116:2380,enode3=http://172.18.240.120:2380 \</div><div class="line">        --initial-cluster-state new</div></pre></td></tr></table></figure>
+<p><code>enode1</code>为每个etcd节点的name，因此三个脚本分别是<code>enode1</code>、<code>enode2</code>、<code>enode3</code>，接着替换<code>--initial-advertise-peer-urls</code>、<code>--listen-peer-urls</code>、<code>--advertise-client-urls</code>、<code>--listen-client-urls</code>分别为其他两台机器的IP。</p>
+<p>现在在etcd的github上下载合适的包，解压后复制脚本到解压后的目录启动etcd：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nohup sh etcd.sh &gt; etcd.log 2&gt;&amp;1 &amp;</div></pre></td></tr></table></figure>
+<p><strong>Docker</strong></p>
+<p>Calico需要在Docker添加启动参数<code>--cluster-store</code>指定etcd，分别修改三台机器的Docker启动参数，添加<code>--cluster-store</code>指定已经部署好的etcd地址并重启Docker服务。</p>
+<h2 id="安装calicoctl"><a href="#安装calicoctl" class="headerlink" title="安装calicoctl"></a>安装calicoctl</h2><p>Calico的操作均是通过<code>calicoctl</code>来操作的，因此首先安装<code>calicoctl</code>。下载<code>calicoctl</code>二进制执行文件并复制到系统环境目录中：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo wget -O /usr/local/bin/calicoctl https://github.com/projectcalico/calicoctl/releases/download/v1.3.0/calicoctl</div><div class="line">sudo chmod +x /usr/local/bin/calicoctl</div></pre></td></tr></table></figure>
+<p>现在就可以运行<code>calico/node</code>，<code>calico/node</code>时间上运行的也是一个Docker容器。因此有两种方式，一种是直接使用<code>calicoctl</code>，另一种则是直接使用Docker命令。</p>
+<p><strong>calicoctl</strong></p>
+<p>直接使用<code>calicoctl</code>命令分别在3台机器中的每一台运行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo calicoctl node run --node-image=quay.io/calico/node:v1.3.0</div></pre></td></tr></table></figure>
+<p>容器创建成功之后就可以查看当前Calico 的状态：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">$ calicoctl node status</div><div class="line">Calico process is running.</div><div class="line"></div><div class="line">IPv4 BGP status</div><div class="line">+----------------+-------------------+-------+------------+-------------+</div><div class="line">|  PEER ADDRESS  |     PEER TYPE     | STATE |   SINCE    |    INFO     |</div><div class="line">+----------------+-------------------+-------+------------+-------------+</div><div class="line">| 172.18.240.119 | node-to-node mesh | up    | 2017-07-14 | Established |</div><div class="line">| 172.18.240.120 | node-to-node mesh | up    | 2017-07-14 | Established |</div><div class="line">+----------------+-------------------+-------+------------+-------------+</div><div class="line"></div><div class="line">IPv6 BGP status</div><div class="line">No IPv6 peers found.</div></pre></td></tr></table></figure>
+<p>可以看到已经正常运行。</p>
+<p><strong>docker</strong></p>
+<p><code>calicoctl</code>可以打印出使用Docker运行的命令，添加参数运行<code>--init-system</code>和<code>--dry-run</code>打印命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">$ calicoctl node run --init-system --dryrun --node-image=quay.io/calico/node:v1.3.0</div><div class="line">Use the following command to start the calico/node container:</div><div class="line"></div><div class="line">docker run --net=host --privileged --name=calico-node --rm -e ETCD_AUTHORITY=127.0.0.1:2379 -e ETCD_SCHEME=http -e ETCD_ENDPOINTS= -e NODENAME=calico -e CALICO_NETWORKING_BACKEND=bird -e NO_DEFAULT_POOLS= -e CALICO_LIBNETWORK_ENABLED=true -e CALICO_LIBNETWORK_IFPREFIX=cali -v /var/run/calico:/var/run/calico -v /lib/modules:/lib/modules -v /var/log/calico:/var/log/calico -v /run/docker/plugins:/run/docker/plugins -v /var/run/docker.sock:/var/run/docker.sock quay.io/calico/node:v1.3.0</div><div class="line"></div><div class="line">Use the following command to stop the calico/node container:</div><div class="line"></div><div class="line">docker stop calico-node</div></pre></td></tr></table></figure>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>上面已经安装好了Calico，现在可以创建一个Calico的网络：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker network create --driver calico --ipam-driver calico-ipam calico-network</div></pre></td></tr></table></figure>
+<p>现在使用<code>docker network ls</code>就可以看到这个叫做<code>calico-network</code>网络，在运行容器的时候执行这个网络就可以为这个容器应用Calico网络。</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2017/07/17/部署Docker-Calico网络/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>
