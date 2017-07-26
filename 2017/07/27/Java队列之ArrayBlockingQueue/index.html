@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java队列之ArrayBlockingQueue | That&#39;s a interesting</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript" />
+  
+
+  <meta name="description" content="谈论ArrayBlockingQueue之前先说说初衷。之前在做私有容器云的持续交付时用到了Disruptor，这是一个进程内的高吞吐量低延迟的队列。 公司本身是在电商平台商家营销的SAAS产品，同时在技术架构层面做微服务化落地，拆分的服务也比较多，涉及的到源码仓库也比较多，迭代也很频繁。持续集成中有用户主动触发的构建，也有代码提交后触发的构建，因此用它主要来做构建通知的接收。系统对外提供的是RE">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java队列之ArrayBlockingQueue">
+<meta property="og:url" content="http://yoursite.com/2017/07/27/Java队列之ArrayBlockingQueue/index.html">
+<meta property="og:site_name" content="That&#39;s a interesting">
+<meta property="og:description" content="谈论ArrayBlockingQueue之前先说说初衷。之前在做私有容器云的持续交付时用到了Disruptor，这是一个进程内的高吞吐量低延迟的队列。 公司本身是在电商平台商家营销的SAAS产品，同时在技术架构层面做微服务化落地，拆分的服务也比较多，涉及的到源码仓库也比较多，迭代也很频繁。持续集成中有用户主动触发的构建，也有代码提交后触发的构建，因此用它主要来做构建通知的接收。系统对外提供的是RE">
+<meta property="og:updated_time" content="2017-07-26T17:20:13.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java队列之ArrayBlockingQueue">
+<meta name="twitter:description" content="谈论ArrayBlockingQueue之前先说说初衷。之前在做私有容器云的持续交付时用到了Disruptor，这是一个进程内的高吞吐量低延迟的队列。 公司本身是在电商平台商家营销的SAAS产品，同时在技术架构层面做微服务化落地，拆分的服务也比较多，涉及的到源码仓库也比较多，迭代也很频繁。持续集成中有用户主动触发的构建，也有代码提交后触发的构建，因此用它主要来做构建通知的接收。系统对外提供的是RE">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=028c63b1" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/link/"
+            target="_self"
+            >
+            友链
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#队列类型"><span class="toc-text">队列类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ArrayBlockingQueue"><span class="toc-text">ArrayBlockingQueue</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-Java队列之ArrayBlockingQueue" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">Java队列之ArrayBlockingQueue</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2017.07.27</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Alan Yang</span>
+        </span>
+      
+
+      
+
+
+      
+        <span>
+          <i class="icon-comment"></i>
+          <a href="http://hialan.com/2017/07/27/Java队列之ArrayBlockingQueue/#disqus_thread"></a>
+        </span>
+      
+
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>谈论ArrayBlockingQueue之前先说说初衷。之前在做私有容器云的持续交付时用到了Disruptor，这是一个进程内的高吞吐量低延迟的队列。</p>
+<p>公司本身是在电商平台商家营销的SAAS产品，同时在技术架构层面做微服务化落地，拆分的服务也比较多，涉及的到源码仓库也比较多，迭代也很频繁。持续集成中有用户主动触发的构建，也有代码提交后触发的构建，因此用它主要来做构建通知的接收。系统对外提供的是RESTful接口来操作构建的触发，构建触发需要先保存触发的时间及其他记录，因此把这些通知放到队列中，接口接收到通知后立即返回，后台在接着来处理这些构建。</p>
+<p>之所以没有考虑使用Java内置线程安全的队列，其一还是自己比较懒，用内置队列有很多东西还得自己实现；其二是想借着使用来深入看看Disruptor的设计思想是怎么保证它的高吞吐量和低延迟的。</p>
+<p>Java内置的队列在平常的开发当中也足够使用，因此准备写一系列文章来研究Java的内置队列。</p>
+<h2 id="队列类型"><a href="#队列类型" class="headerlink" title="队列类型"></a>队列类型</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">BlockingQueue</div></pre></td></tr></table></figure>
+<h2 id="ArrayBlockingQueue"><a href="#ArrayBlockingQueue" class="headerlink" title="ArrayBlockingQueue"></a>ArrayBlockingQueue</h2><p>ArrayBlockingQueue是一个有界有锁的阻塞队列，也就是说这个队列是线程安全的且有界的。它底层通过一个数组是实现，并通过<code>ReentrantLock</code>来保证它的线程安全。</p>
+<p>先来看看这个类其中的主要成员：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/** 这个就是实际存放数据的数组 */</span></div><div class="line"><span class="keyword">final</span> Object[] items;</div><div class="line"></div><div class="line"><span class="comment">/** 队列数据获取的下一个位置索引 */</span></div><div class="line"><span class="keyword">int</span> takeIndex;</div><div class="line"></div><div class="line"><span class="comment">/** 存放数据的的下一个索引 */</span></div><div class="line"><span class="keyword">int</span> putIndex;</div><div class="line"></div><div class="line"><span class="comment">/** 队列的的长度 */</span></div><div class="line"><span class="keyword">int</span> count;</div><div class="line"></div><div class="line"><span class="comment">/** 这个就是控制线程安全的锁 */</span></div><div class="line"><span class="keyword">final</span> ReentrantLock lock;</div><div class="line"></div><div class="line"><span class="comment">/** Condition for waiting takes */</span></div><div class="line"><span class="keyword">private</span> <span class="keyword">final</span> Condition notEmpty;</div><div class="line"></div><div class="line"><span class="comment">/** Condition for waiting puts */</span></div><div class="line"><span class="keyword">private</span> <span class="keyword">final</span> Condition notFull;</div></pre></td></tr></table></figure>
+<p>ArrayBlockingQueue提供了很多方法，队列最基本的出队入队的方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">enqueue</span><span class="params">(E x)</span> </span>&#123;</div><div class="line">    <span class="comment">// assert lock.getHoldCount() == 1;</span></div><div class="line">    <span class="comment">// assert items[putIndex] == null;</span></div><div class="line">    <span class="keyword">final</span> Object[] items = <span class="keyword">this</span>.items;</div><div class="line">    items[putIndex] = x;</div><div class="line">    <span class="keyword">if</span> (++putIndex == items.length)</div><div class="line">        putIndex = <span class="number">0</span>;</div><div class="line">    count++;</div><div class="line">    notEmpty.signal();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> E <span class="title">dequeue</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="comment">// assert lock.getHoldCount() == 1;</span></div><div class="line">    <span class="comment">// assert items[takeIndex] != null;</span></div><div class="line">    <span class="keyword">final</span> Object[] items = <span class="keyword">this</span>.items;</div><div class="line">    <span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</div><div class="line">    E x = (E) items[takeIndex];</div><div class="line">    items[takeIndex] = <span class="keyword">null</span>;</div><div class="line">    <span class="keyword">if</span> (++takeIndex == items.length)</div><div class="line">        takeIndex = <span class="number">0</span>;</div><div class="line">    count--;</div><div class="line">    <span class="keyword">if</span> (itrs != <span class="keyword">null</span>)</div><div class="line">        itrs.elementDequeued();</div><div class="line">    notFull.signal();</div><div class="line">    <span class="keyword">return</span> x;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>待续…</p>
+
+    
+  </div>
+</article>
+
+</div>
+
+
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">支持一下</span>
+      <div class="donation-body">
+        <div class="tip text-center">扫一扫，支持forsigner</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/qr-wechat.png" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/qr-alipay.png" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/link/"
+              target="_self"
+              >
+              友链
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+  <section class="disqus-comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+  </section>
+
+  <script>
+    var disqus_shortname = 'forsigner';
+    
+    var disqus_url = 'http://yoursite.com/2017/07/27/Java队列之ArrayBlockingQueue/';
+    
+    (function(){
+      var dsq = document.createElement('script');
+      dsq.type = 'text/javascript';
+      dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script id="dsq-count-scr" src="//forsigner.disqus.com/count.js" async></script>
+
+
+
+    
+
+
+
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>
